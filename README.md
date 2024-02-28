@@ -79,3 +79,23 @@ npm-debug.log
 coverage
 \*.log
 ```
+
+2. Mengenal Express JS
+
+ExpressJS adalah salah satu Web Framework OpenSource paling populer di NodeJS
+ExpressJS pertama kali dibuat tahun 2010, dan karena sangat populer, ExpressJS sekarang sudah menjadi hal yang wajib dikuasai ketika kita akan membuat Web menggunakan NodeJS
+
+Application
+
+Saat kita membuat web menggunakan ExpressJS, kita akan membuat object Application
+Application adalah object utama dalam library ExpressJS
+
+Application secara default tidak berjalan, jika kita ingin menjalankan Application nya, kita perlu menggunakan method listen(port)
+Dimana port adalah nomor port yang ingin kita gunakan untuk menjalankan web nya
+Pastikan port yang kita pilih tidak bentrok dengan aplikasi lain
+
+```
+
+```
+
+3. Basic Routing
