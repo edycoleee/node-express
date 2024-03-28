@@ -22,7 +22,7 @@ npm install jest --save-dev
 npm install babel-jest --save-dev
 npm install @babel/preset-env --save-dev
 npm install @babel/plugin-transform-runtime --save-dev
-
+npm install --save-dev nodemon
 npm install winston winston-daily-rotate-file
 
 //Edit file package.json
@@ -30,8 +30,10 @@ npm install winston winston-daily-rotate-file
 "main": "./src/index.js",
 "type": "module",
 "scripts": {
-"test": "jest"
-},
+    "test": "jest",
+    "start": "node ./src/index.js",
+    "dev": "nodemon ./src/index.js"
+  },
 "jest": {
 "maxConcurrency" : 2,
 "verbose": true,
@@ -95,7 +97,17 @@ Dimana port adalah nomor port yang ingin kita gunakan untuk menjalankan web nya
 Pastikan port yang kita pilih tidak bentrok dengan aplikasi lain
 
 ```
+//src/index.js
+import express from "express";
 
+export const app = express();
+
+// Jalankan server
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, () => {
+  console.log(`Server started on port ${PORT}`);
+});
 ```
 
 3. Basic Routing
