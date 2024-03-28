@@ -22,6 +22,7 @@ npm install jest --save-dev
 npm install babel-jest --save-dev
 npm install @babel/preset-env --save-dev
 npm install @babel/plugin-transform-runtime --save-dev
+npm install jest supertest @types/jest --save-dev
 npm install --save-dev nodemon
 npm install winston winston-daily-rotate-file
 
@@ -109,5 +110,67 @@ app.listen(PORT, () => {
   console.log(`Server started on port ${PORT}`);
 });
 ```
+`npm run dev`
 
-3. Basic Routing
+3. Basic Testing
+
+Memisahkan index.js dan application.js ,untuk memudahkan pengetesan dengan unit test
+
+```
+//src/index.js
+import { app } from "./application.js";
+
+//1. Jalankan server
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, () => {
+    console.log(`Server started on port ${PORT}`);
+});
+```
+
+
+```
+//src/application.js
+import express from "express";
+
+export const app = express();
+
+app.use(express.json());
+
+//2. Contoh Endpoint API
+app.get('/', (req, res) => {
+    console.log('Hello World requested');
+    res.send('Hello World!');
+});
+```
+
+- melakukan pengetesan dengan request.rest
+
+```
+### 
+GET http://localhost:3000/
+
+###
+```
+
+- melakukan pengetesan dengan unit test
+
+```
+//test/app.test.js
+const request = require('supertest');
+const { app } = require('../src/application');
+//const { app } = require('../src');
+
+describe('GET /', () => {
+  it('should return Hello World', async () => {
+    const response = await request(app).get('/');
+    expect(response.status).toBe(200);
+    expect(response.text).toBe('Hello World!');
+  });
+});
+
+//jalankan test
+//npx jest app.test.js
+```
+
+4. Basic Routing

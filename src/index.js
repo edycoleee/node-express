@@ -1,11 +1,9 @@
 //src/index.js
-import express from "express";
+import { app } from "./application.js";
 
-export const app = express();
-
-// Jalankan server
+//1. Jalankan server
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
-  console.log(`Server started on port ${PORT}`);
+    console.log(`Server started on port ${PORT}`);
 });
