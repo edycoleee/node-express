@@ -25,6 +25,7 @@ npm install @babel/plugin-transform-runtime --save-dev
 npm install jest supertest @types/jest --save-dev
 npm install --save-dev nodemon
 npm install winston winston-daily-rotate-file
+npm install uuid
 
 //Edit file package.json
 
@@ -294,7 +295,7 @@ describe('Test Untuk 1 dan 3', () => {
 
 ### 5. Membuat EndPoint CRUD Dokumentasi >> Object
 
-### 6. GET Data ALL (READ)
+### 6. GET Data SEARCH ALL (READ)
 
 ### 7. GET Data /id (READ)
 
