@@ -233,7 +233,7 @@ test("Test GET /oby", async () => {
 })
 ```
 
-4. Req Body >> Response Body
+## 4. Req Body >> Response Body
 
 - endpoint POST http://localhost:3000/api/pasien
 
@@ -291,3 +291,15 @@ describe('Test Untuk 1 dan 3', () => {
 
 });
 ```
+
+### 5. Membuat EndPoint CRUD Dokumentasi
+
+### 6. GET Data ALL (READ)
+
+### 7. GET Data /id (READ)
+
+### 8. POST Data (CREATE)
+
+### 9. DELETE Data /id (DELETE)
+
+### 10. PUT Data /id (UPDATE)
