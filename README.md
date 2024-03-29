@@ -129,6 +129,8 @@ app.listen(PORT, () => {
 });
 ```
 
+- endpoint GET http://localhost:3000/
+
 ```
 //src/application.js
 import express from "express";
@@ -174,6 +176,8 @@ describe('GET /', () => {
 ```
 
 4. Basic Routing
+
+- end point GET http://localhost:3000/oby
 
 ```
 //src/application.js
@@ -231,10 +235,10 @@ test("Test GET /oby", async () => {
 
 4. Req Body >> Response Body
 
-- endpoint
+- endpoint POST http://localhost:3000/api/pasien
 
 ```
-//3. Contoh Endpoint API >> GET /pasien >> Req Body >> Res Body
+//3. Contoh Endpoint API >> POST /api/pasien >> Req Body >> Res Body
 router.post('/pasien', (req, res, next) => {
     res.json({
         message: 'POST Data Pasien Sukses',

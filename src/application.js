@@ -25,7 +25,7 @@ router.get('/oby', (req, res, next) => {
     })
 })
 
-//3. Contoh Endpoint API >> GET /pasien >> Req Body >> Res Body
+//3. Contoh Endpoint API >> POST /api/pasien >> Req Body >> Res Body
 router.post('/pasien', (req, res, next) => {
     res.json({
         message: 'POST Data Pasien Sukses',
