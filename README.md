@@ -292,7 +292,7 @@ describe('Test Untuk 1 dan 3', () => {
 });
 ```
 
-### 5. Membuat EndPoint CRUD Dokumentasi
+### 5. Membuat EndPoint CRUD Dokumentasi >> Object
 
 ### 6. GET Data ALL (READ)
 
