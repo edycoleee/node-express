@@ -1,6 +1,6 @@
 ## BELAJAR NODE JS EXPRESS
 
-1. PERSIAPAN
+## 1. PERSIAPAN
 
 ```
 //Membuat Repo di github
@@ -83,7 +83,7 @@ coverage
 \*.log
 ```
 
-2. Mengenal Express JS
+## 2. Mengenal Express JS
 
 ExpressJS adalah salah satu Web Framework OpenSource paling populer di NodeJS
 ExpressJS pertama kali dibuat tahun 2010, dan karena sangat populer, ExpressJS sekarang sudah menjadi hal yang wajib dikuasai ketika kita akan membuat Web menggunakan NodeJS
@@ -110,11 +110,12 @@ app.listen(PORT, () => {
   console.log(`Server started on port ${PORT}`);
 });
 ```
+
 `npm run dev`
 
-3. Basic Testing
+## 3. Basic Testing
 
-Memisahkan index.js dan application.js ,untuk memudahkan pengetesan dengan unit test
+- Memisahkan index.js dan application.js ,untuk memudahkan pengetesan dengan unit test
 
 ```
 //src/index.js
@@ -127,7 +128,6 @@ app.listen(PORT, () => {
     console.log(`Server started on port ${PORT}`);
 });
 ```
-
 
 ```
 //src/application.js
@@ -147,7 +147,7 @@ app.get('/', (req, res) => {
 - melakukan pengetesan dengan request.rest
 
 ```
-### 
+###
 GET http://localhost:3000/
 
 ###
@@ -183,14 +183,15 @@ export const app = express();
 
 app.use(express.json());
 
-//2. Contoh Endpoint API >> GET / >> Response Text
+//1. Contoh Endpoint API >> GET / >> Response Text
 app.get('/', (req, res) => {
     console.log('Hello World requested');
     res.send('Hello World!');
 });
 
-//3. Contoh Endpoint API >> GET /oby >> Response Object dg Router
-const router = express.Router();
+//2. Contoh Endpoint API >> GET /oby >> Response Object dg router
+export const router = express.Router();
+app.use(router)
 const dtpasien1 = {
     nama: "Edy",
     alamat: "Semarang"
@@ -201,12 +202,88 @@ router.get('/oby', (req, res, next) => {
         data: dtpasien1
     })
 })
+
 ```
+
 - test rest
-```
 
 ```
+###
+GET http://localhost:3000/oby
+```
+
 - unit test
+
+```
+//Test GET http://localhost:3000/oby
+test("Test GET /oby", async () => {
+  //Cek response Object >> body >> toEqual
+  const response = await request(app).get("/oby");
+  expect(response.body).toEqual({
+    message: 'GET Data Pasien Sukses',
+    data: {
+      nama: "Edy",
+      alamat: "Semarang"
+    }
+  });
+})
 ```
 
+4. Req Body >> Response Body
+
+- endpoint
+
+```
+//3. Contoh Endpoint API >> GET /pasien >> Req Body >> Res Body
+router.post('/pasien', (req, res, next) => {
+    res.json({
+        message: 'POST Data Pasien Sukses',
+        data: req.body
+    })
+})
+app.use("/api", router)
+```
+
+- request test
+
+```
+###
+POST http://localhost:3000/api/pasien
+Content-Type: application/json
+
+{
+  "nama" : "Silmi",
+  "alamat": "Karangawen"
+}
+```
+
+- unit test
+
+```
+describe('Test Untuk 1 dan 3', () => {
+
+  //1. test GET http://localhost:3000
+  it('should return Hello World', async () => {
+    const response = await request(app).get('/');
+    expect(response.status).toBe(200);
+    expect(response.text).toBe('Hello World!');
+  });
+
+  //3. test POST http://localhost:3000/api/pasien
+  it('should return Body', async () => {
+    const dataKirim = {
+      "nama": "Silmi",
+      "alamat": "Karangawen"
+    }
+    const response = await request(app)
+      .post('/api/pasien')
+      .send(dataKirim);
+    expect(response.status).toBe(200);
+    expect(response.body).toEqual({
+      message: 'POST Data Pasien Sukses',
+      data: dataKirim
+    });
+  });
+
+});
 ```

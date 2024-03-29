@@ -1,5 +1,14 @@
 ### 
 GET http://localhost:3000/
 
-###
+### 
 GET http://localhost:3000/oby
+
+### 
+POST http://localhost:3000/api/pasien
+Content-Type: application/json
+
+{
+  "nama" : "Silmi",
+  "alamat": "Karangawen"
+}
