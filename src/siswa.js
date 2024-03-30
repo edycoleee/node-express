@@ -1,4 +1,5 @@
 //src/siswa.js
+import { log } from "console";
 import express from "express";
 import { v4 as uuid } from 'uuid';
 
@@ -22,12 +23,12 @@ let dbDataSiswa = [
   }
 ]
 
-// 1. Search Contact API
+// 1. Search Siswa API
 SiswaRouter.get('/', (req, res, next) => {
   res.json({ data: dbDataSiswa })
 })
 
-//2. Get Contact API
+//2. Get Siswa API
 SiswaRouter.get('/:id', (req, res, next) => {
   //Fungsi Get Siswa by ID
   const dtSiswa = getdbSiswaId(req.params.id)
@@ -54,23 +55,26 @@ SiswaRouter.post('/', (req, res, next) => {
   res.json({ data: dataRespon })
 })
 
-//4. Remove Contact API
+//4. Remove Siswa API
 SiswaRouter.delete('/:id', (req, res, next) => {
 
   const dtSiswa = getdbSiswaId(req.params.id)
+  console.log(dtSiswa);
   if (!dtSiswa || dtSiswa.length === 0) {
     return res.status(404).json({ "errors": "Siswa is not found" })
-  }
+  } else {
+    console.log("delete");
+    const deldbSiswaId = (id) => {
+      dbDataSiswa = dbDataSiswa.filter((dtSiswa) => dtSiswa.id !== id)
+    }
 
-  const deldbSiswaId = (id) => {
-    dbDataSiswa = dbDataSiswa.filter((dtSiswa) => dtSiswa.id !== id)
-  }
+    deldbSiswaId(req.params.id)
+    return res.status(200).json({ "data": dbDataSiswa })
 
-  deldbSiswaId(req.params.id)
-  res.json({ "data": dbDataSiswa })
+  }
 })
 
-//5. Update Contact API
+//5. Update Siswa API
 SiswaRouter.put('/:id', (req, res, next) => {
   const bodySiswa = req.body;
   const idEdit = req.params.id
@@ -91,7 +95,7 @@ SiswaRouter.put('/:id', (req, res, next) => {
   res.json({ data: dataRespon })
 })
 
-//Get Pasien by ID
+//Get Siswa by ID
 const getdbSiswaId = (id) => {
   //return dbDataSiswa.find((siswa) => siswa.id === parseInt(id))
   return dbDataSiswa.find((siswa) => siswa.id === id)
