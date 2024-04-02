@@ -40,7 +40,7 @@ describe('TEST REST FULL API', () => {
         const getDataResponse = await request(app)
             .post('/api/siswa')
             .send(dataKirim);
-            expect(getDataResponse.status).toBe(200);
+            expect(getDataResponse.status).toBe(201);
             expect(getDataResponse.text).toBe('ADD NEW SISWA');
     })
 

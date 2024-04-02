@@ -559,15 +559,33 @@ GET http://localhost:3000/api/siswa
 ### 9. GET Data /id (READ)
 - ROUTING
 ```
-
+//2. Get Siswa API by ID
+SiswaRouter.get('/:id',async (req, res, next) => {
+    try {
+        const { id } = req.params;
+        const rows = await query('SELECT * FROM tbsiswa WHERE id = ?', [id])
+        console.log(`GET DATA: ${rows}`);
+        res.status(200).json(rows)
+      } catch (error) {
+        logger.error(`Error: ${error.message}`);
+        res.status(500).send('Internal Server Error');
+      }
+  })
 ```
 - .REST
 ```
-
+### 7. GET Data /id (READ) 
+GET http://localhost:3000/api/siswa/1
 ```
 - UNIT TEST
 ```
-
+    //2. GET http://localhost:3000/api/siswa/1
+    it('GET Data by ID (READ)', async () => {
+        const getDataResponse = await request(app).get('/api/siswa/1');
+        expect(getDataResponse.status).toBe(200);
+        // Memeriksa isi object
+        expect(getDataResponse.body).toEqual(dataTest);
+    })
 ```
 ### 10. POST Data (CREATE)
 - ROUTING
