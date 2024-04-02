@@ -294,6 +294,8 @@ describe('Test Untuk 1 dan 3', () => {
 
 ### 5. Membuat EndPoint CRUD Dokumentasi
 
+### SETTING MYSQL
+
 ### 6. GET Data ALL (READ)
 
 ### 7. GET Data /id (READ)
