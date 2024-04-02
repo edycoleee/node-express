@@ -12,3 +12,35 @@ Content-Type: application/json
   "nama" : "Silmi",
   "alamat": "Karangawen"
 }
+
+### 6. GET Data SEARCH ALL (READ) 
+GET http://localhost:3000/api/siswa
+
+### 7. GET Data /id (READ) 
+GET http://localhost:3000/api/siswa/1
+
+### 8. POST Data (CREATE) 
+POST http://localhost:3000/api/siswa 
+Content-Type: application/json
+
+{
+"first_name": "Edy", 
+"last_name": "Kholid", 
+"email": "edy@gmail.com", 
+"phone": "8787878787"
+}
+
+### 9. DELETE Data /id (DELETE) 
+DELETE http://localhost:3000/api/siswa/1
+
+### 10. PUT Data /id (UPDATE) 
+PUT http://localhost:3000/api/siswa/1 
+Content-Type: application/json
+
+{
+"first_name": "Silmi-Rev", 
+"last_name": "Ayra-Rev", 
+"email": "silmi@gmail.com", 
+"phone": "32423423434"
+
+}

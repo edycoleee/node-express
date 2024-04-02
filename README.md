@@ -293,15 +293,318 @@ describe('Test Untuk 1 dan 3', () => {
 ```
 
 ### 5. Membuat EndPoint CRUD Dokumentasi
+dokumentasi pada :  //docs/siswa.md 
 
-### SETTING MYSQL
+### 6. SETTING MYSQL
+- Membuat database / Schema dbsiswa
 
-### 6. GET Data ALL (READ)
+```
+CREATE SCHEMA `dbsekolah` ;
+```
 
-### 7. GET Data /id (READ)
+- Membuat table tbsiswa
 
-### 8. POST Data (CREATE)
+```
+USE dbsekolah
 
-### 9. DELETE Data /id (DELETE)
+CREATE TABLE `dbsekolah`.`tbsiswa` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `first_name` VARCHAR(100) NOT NULL,
+  `last_name` VARCHAR(100) NULL,
+  `email` VARCHAR(100) NULL,
+  `phone` VARCHAR(100) NULL,
+  PRIMARY KEY (`id`));
 
-### 10. PUT Data /id (UPDATE)
+INSERT INTO tbsiswa(first_name,last_name,email,phone)
+VALUES
+('Silmi','Ayra','silmi@gmail.com','32423423434'),
+('Nafi','Dhafin','afin@gmail.com','112233445566');
+```
+
+- Koneksi ke database
+
+```
+DB_HOST=localhost
+DB_USERNAME=root
+DB_PASSWORD=760410
+DB_NAME=dbsiswa
+DB_PORT=3306
+```
+
+- konfigurasi mysql
+
+`npm install mysql2`
+
+```
+//src/util/config.js
+
+export const config = {
+  db: {
+    /* don't expose password or any sensitive info, done only for demo */
+    host: "localhost",
+    user: "root",
+    password: "760410",
+    database: "dbsiswa",
+    connectTimeout: 60000
+  },
+};
+
+```
+
+```
+//src/util/db.js
+import mysql from "mysql2/promise";
+import { config } from "../application/config.js";
+
+export async function query(sql, params) {
+  const connection = await mysql.createConnection(config.db);
+  const [results,] = await connection.execute(sql, params);
+  await connection.end();
+  return results;
+}
+
+```
+- membuat routing siswa
+
+```
+//src/application.js
+import express from "express";
+import { SiswaRouter } from "./siswa.js";
+
+..........................
+
+//4. Router Siswa
+router.use("/siswa", SiswaRouter)
+
+app.use("/api", router)
+
+```
+
+```
+//src/siswa.js
+import express from "express";
+
+export const SiswaRouter = express.Router();
+```
+
+### 7. TEST ENDPOINT
+- ROUTING
+```
+//src/siswa.js
+import express from "express";
+
+export const SiswaRouter = express.Router();
+
+// 1. Search Siswa API
+SiswaRouter.get('/', (req, res, next) => {
+    res.send("GET ALL SISWA")
+  })
+
+//2. Get Siswa API by ID
+SiswaRouter.get('/:id', (req, res, next) => {
+    res.send("GET SISWA")
+  })
+
+//3. Create Siswa API
+SiswaRouter.post('/', (req, res, next) => {
+    res.send("ADD NEW SISWA")
+  })
+
+//4. Remove Siswa API
+SiswaRouter.delete('/:id', (req, res, next) => {
+    res.send("DELETE SISWA")
+  })
+
+//5. Update Siswa API
+SiswaRouter.put('/:id', (req, res, next) => {
+    res.send("UPDATE SISWA")
+})
+```
+- .REST
+```
+### 6. GET Data SEARCH ALL (READ) 
+GET http://localhost:3000/api/siswa
+
+### 7. GET Data /id (READ) 
+GET http://localhost:3000/api/siswa/1
+
+### 8. POST Data (CREATE) 
+POST http://localhost:3000/api/siswa 
+Content-Type: application/json
+
+{
+"first_name": "Edy", 
+"last_name": "Kholid", 
+"email": "edy@gmail.com", 
+"phone": "8787878787"
+}
+
+### 9. DELETE Data /id (DELETE) 
+DELETE http://localhost:3000/api/siswa/1
+
+### 10. PUT Data /id (UPDATE) 
+PUT http://localhost:3000/api/siswa/1 
+Content-Type: application/json
+
+{
+"first_name": "Silmi-Rev", 
+"last_name": "Ayra-Rev", 
+"email": "silmi@gmail.com", 
+"phone": "32423423434"
+
+}
+```
+- UNIT TEST
+```
+//test/siswa.test.js
+const request = require('supertest');
+const { app } = require('../src/application');
+
+describe('TEST REST FULL API', () => {
+
+    //1. GET http://localhost:3000/api/siswa
+    it('GET Data SEARCH ALL (READ)', async () => {
+        const getDataResponse = await request(app).get('/api/siswa');
+        expect(getDataResponse.status).toBe(200);
+        expect(getDataResponse.text).toBe('GET ALL SISWA');
+    })
+
+    //2. GET http://localhost:3000/api/siswa/1
+    it('GET Data by ID (READ)', async () => {
+        const getDataResponse = await request(app).get('/api/siswa/1');
+        expect(getDataResponse.status).toBe(200);
+        expect(getDataResponse.text).toBe('GET SISWA');
+    })
+
+    //3. POST http://localhost:3000/api/siswa
+    it('POST Data (CREATE)', async () => {
+        const dataKirim = {
+            "first_name": "Edy",
+            "last_name": "Kholid",
+            "email": "edy@gmail.com",
+            "phone": "8787878787"
+        }
+        const getDataResponse = await request(app)
+            .post('/api/siswa')
+            .send(dataKirim);
+            expect(getDataResponse.status).toBe(200);
+            expect(getDataResponse.text).toBe('ADD NEW SISWA');
+    })
+
+    //4. DELETE http://localhost:3000/api/siswa/1
+    it('DELETE Data by Id (DELETE)', async () => {
+        const getDataResponse = await request(app).delete('/api/siswa/id');
+        expect(getDataResponse.status).toBe(200);
+        expect(getDataResponse.text).toBe('DELETE SISWA');
+    })
+
+    //5. PUT http://localhost:3000/api/siswa/1
+    it('POST Data (CREATE)', async () => {
+        const dataKirim = {
+            "first_name": "Silmi-Rev",
+            "last_name": "Ayra-Rev",
+            "email": "silmi@gmail.com",
+            "phone": "32423423434"
+          }
+        const getDataResponse = await request(app)
+            .put('/api/siswa/1')
+            .send(dataKirim);
+            expect(getDataResponse.status).toBe(200);
+            expect(getDataResponse.text).toBe('UPDATE SISWA');
+    })
+
+})
+```
+
+
+### 8. GET Data ALL (READ)
+- ROUTING
+```
+// 1. Search Siswa API
+SiswaRouter.get('/', async (req, res, next) => {
+    try {
+        const rows = await query('SELECT * FROM tbsiswa')
+        console.log(`GET DATA: ${rows}`);
+        res.status(200).json(rows)
+      } catch (error) {
+        logger.error(`Error: ${error.message}`);
+        res.status(500).send('Internal Server Error');
+      }
+  })
+```
+- .REST
+```
+### 6. GET Data SEARCH ALL (READ) 
+GET http://localhost:3000/api/siswa
+```
+- UNIT TEST
+```
+    const dataTest = {
+        "id": 1,
+        "first_name": "Silmi",
+        "last_name": "Ayra",
+        "email": "silmi@gmail.com",
+        "phone": "32423423434"
+    }
+
+    //1. GET http://localhost:3000/api/siswa
+    it('GET Data SEARCH ALL (READ)', async () => {
+        const getDataResponse = await request(app).get('/api/siswa');
+        // Memeriksa panjang array
+        expect(getDataResponse.body.length).toBeGreaterThan(0);
+        // Memeriksa isi array
+        expect(getDataResponse.body).toEqual(expect.arrayContaining([dataTest]));
+    })
+```
+### 9. GET Data /id (READ)
+- ROUTING
+```
+
+```
+- .REST
+```
+
+```
+- UNIT TEST
+```
+
+```
+### 10. POST Data (CREATE)
+- ROUTING
+```
+
+```
+- .REST
+```
+
+```
+- UNIT TEST
+```
+
+```
+### 11. DELETE Data /id (DELETE)
+- ROUTING
+```
+
+```
+- .REST
+```
+
+```
+- UNIT TEST
+```
+
+```
+### 12. PUT Data /id (UPDATE)
+- ROUTING
+```
+
+```
+- .REST
+```
+
+```
+- UNIT TEST
+```
+
+```
