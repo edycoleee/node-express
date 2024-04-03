@@ -466,21 +466,27 @@ GET http://localhost:3000/api/siswa/1
         expect(getDataResponse.body.data).toEqual(dataTest);
       })
 ```
-### 8. POST Data (CREATE)
+### 8. CREATE : Endpoint : POST /api/siswa
 - Endpoint
 ```
-//3. Create Siswa API
+//3. CREATE : Endpoint : POST /api/siswa >> ambil req body >> simpan ke data siswa
 SiswaRouter.post('/', (req, res, next) => {
+  //ambil data dari request.body
   const dataReq = req.body;
+  //buat id uniq dengan bantuan uuid
   const id = uuid()
+  //Fungsi utk masukkan data kedalam data siswa >> push array object
   const AddDtSiswa = (data) => {
     dbDataSiswa.push({ ...data, id })
+    //log data hasilnya
     console.log(dbDataSiswa);
   }
 
+  //Jalankan Fungsi dan masukkan variable dari body
   AddDtSiswa(dataReq)
+  //Get data siswa berdasarkan id yang sudah dibuat tadi > jika sukses maka akan dapat datanya
   const dataRespon = getdbSiswaId(id)
-
+  //kirim sebagai respon json data yang di dapatkan
   res.json({ data: dataRespon })
 })
 ```
@@ -502,39 +508,50 @@ Content-Type: application/json
 ```
     //3. POST http://localhost:3000/api/siswa
     it('POST Data (CREATE)', async () => {
+      //data request body yang akan dikirim
         const dataKirim = {
             "first_name": "Edy",
             "last_name": "Kholid",
             "email": "edy@gmail.com",
             "phone": "8787878787"
         }
+
         const response = await request(app)
+            //kirim request  POST http://localhost:3000/api/siswa
             .post('/api/siswa')
+            //kirim data kedalam request body 
             .send(dataKirim);
+        //respose status sama 200
         expect(response.status).toBe(200);
         // Memeriksa bahwa respons adalah sebuah objek
         expect(response.body.data).toBeInstanceOf(Object);
-        // Memeriksa apakah objek mengandung nilai tertentu
+        // Memeriksa apakah objek mengandung nilai tertentu "first_name": "Edy"
         expect(response.body.data).toEqual(expect.objectContaining({ "first_name": "Edy" }));
     })
 ```
 ### 9. DELETE Data /id (DELETE)
 - Endpoint
 ```
-//4. Remove Siswa API
+//4. DELETE : Endpoint : DELETE /api/siswa/:id >> filter data yang bukan id(req.params.id) yg dikirim
 SiswaRouter.delete('/:id', (req, res, next) => {
-
+  //cari apakah id data siswa tersebut ada di data siswa >> req.params.id
   const dtSiswa = getdbSiswaId(req.params.id)
+  //tampilkan di log
   console.log(dtSiswa);
+  //jika data siswa tidak ketemu atau array isinya 0
   if (!dtSiswa || dtSiswa.length === 0) {
+    //kirim status 404 dan pesar error
     return res.status(404).json({ "errors": "Siswa is not found" })
   } else {
+    //jika datanya ditemukan
     console.log("delete");
+    //Fungsi delete datasiswa >> filter data yang datasiswa.id tidak sama dengan id
     const deldbSiswaId = (id) => {
       dbDataSiswa = dbDataSiswa.filter((dtSiswa) => dtSiswa.id !== id)
     }
-
+    //panggil fungsi delete dengan mengirimkan id > req.params.id
     deldbSiswaId(req.params.id)
+    //kirim response 200 dan json data siswa sisanya setelah di filter
     return res.status(200).json({ "data": dbDataSiswa })
 
   }
@@ -550,9 +567,12 @@ DELETE http://localhost:3000/api/siswa/1
 ```
     //4. DELETE http://localhost:3000/api/siswa/1
     it('DELETE Data by Id (DELETE)', async () => {
+        // kirimkan request DELETE http://localhost:3000/api/siswa/1 dan tangkap hasilnya > getDataResponse
         const getDataResponse = await request(app).delete('/api/siswa/id');
+        //tampilkan di log
         console.log(getDataResponse);
-        expect(getDataResponse.status).toBe(404);
+        jika datanya didele maka respose status 200
+        expect(getDataResponse.status).toBe(200);
         // Memeriksa isi array tidak mengandung object tertentu
         expect(getDataResponse.body.data).not.toEqual(expect.arrayContaining([dataTest]));
     })
@@ -561,24 +581,34 @@ DELETE http://localhost:3000/api/siswa/1
 ### 10. PUT Data /id (UPDATE)
 - Endpoint
 ```
-//5. Update Siswa API
+//5. UPDATE : Endpoint : PUT /api/siswa/:id
 SiswaRouter.put('/:id', (req, res, next) => {
+  //mengambil data body utk sebagai data update
   const bodySiswa = req.body;
+  //mengambil data param sebagai id data yang akan diupdate
   const idEdit = req.params.id
+  //membuat fungsi update data siswa
   const updatedbSiswa = (id, dataSiswa) => {
+    // cari data yang id nya sesuai dengan map
     dbDataSiswa = dbDataSiswa.map(dtSiswa => {
+      // jika id data sesuai
       if (dtSiswa.id == id) {
+        // update data dengan data yang dikirim dari body
         dtSiswa.first_name = dataSiswa.first_name
         dtSiswa.last_name = dataSiswa.last_name
       }
+      // kembalikan datanya
       return dtSiswa;
     })
+    //satukan dengan semua data siswa
     return dbDataSiswa
   }
 
+  //panggil fungsi update siswa dengan mengirim parameter id dan body
   updatedbSiswa(idEdit, bodySiswa)
-
+  //cari data siswa dengan idEdit
   const dataRespon = getdbSiswaId(idEdit)
+  //kirimkan respon json data yang telah di edit dari hasil pencarian 
   res.json({ data: dataRespon })
 })
 
@@ -600,6 +630,7 @@ Content-Type: application/json
 ```
     //5. PUT http://localhost:3000/api/siswa/1
     it('POST Data (CREATE)', async () => {
+        //kirimkan dta yang kan di edit dalam body
         const dataKirim = {
             "first_name": "Silmi-Rev",
             "last_name": "Ayra-Rev",
@@ -607,10 +638,13 @@ Content-Type: application/json
             "phone": "32423423434"
           }
         const response = await request(app)
+        //kirim request PUT http://localhost:3000/api/siswa/1 > id = 1
             .put('/api/siswa/1')
+            //kirimkan data body
             .send(dataKirim);
+        //hasil status jika sukses = 200
         expect(response.status).toBe(200);
-        // Memeriksa apakah objek mengandung nilai tertentu
+        // Memeriksa apakah objek mengandung nilai tertentu { "first_name": "Silmi-Rev" }
         expect(response.body.data).toEqual(expect.objectContaining({ "first_name": "Silmi-Rev" }));
         expect(response.body.data).toEqual(expect.objectContaining({ "last_name": "Ayra-Rev" }));
     })
