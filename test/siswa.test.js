@@ -51,11 +51,11 @@ describe('TEST REST FULL API', () => {
     //4. DELETE http://localhost:3000/api/siswa/1
     it.skip('DELETE Data by Id (DELETE)', async () => {
 
-        //insert data
+        //insert data >> dapatkan ID
         const dataInsert = ["test", "test", "test@gmail.com", "080900000"]
         const results = await query('INSERT INTO tbsiswa (first_name,last_name,email,phone) VALUES (?, ?, ?,?)', dataInsert);
         const idData = results.insertId
-
+        //gunakan ID untuk request delete by ID
         const getDataResponse = await request(app).delete(`/api/siswa/${idData}`);
         expect(getDataResponse.status).toBe(200);
         expect(getDataResponse.text).toBe('Deleted Successfully');
@@ -66,12 +66,13 @@ describe('TEST REST FULL API', () => {
 describe('PUT /api/siswa/:id', function () {
 
     let idData
+    //insert data baru sebelum test >> simpan ID
     beforeEach(async () => {
         const dataInsert = ["Silmi", "Ayra", "test@gmail.com", "32423423434"]
         const results = await query('INSERT INTO tbsiswa (first_name,last_name,email,phone) VALUES (?, ?, ?,?)', dataInsert);
         idData = results.insertId
     })
-
+    // hapus data setelah test >> detele by ID
     afterEach(async () => {
         await query('DELETE FROM tbsiswa WHERE id = ?', [idData]);
     })

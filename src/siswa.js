@@ -72,13 +72,10 @@ SiswaRouter.put('/:id',async  (req, res, next) => {
     console.log(req.params,req.body);
     try {
         const { id } = req.params
-
         const { first_name, last_name, email, phone } = req.body;
         await query('UPDATE tbsiswa SET first_name=?, last_name=? ,email=? ,phone=? WHERE id=?', [first_name, last_name, email, phone,id]);
-        
         const rows = await query('SELECT * FROM tbsiswa WHERE id = ?', [id]);
         console.log(`POST NEW DATA: ${JSON.stringify(rows)}`);
-        
         res.status(201).send({ 'data': rows[0] });
     } catch (error) {
         console.log(`Error: ${error.message}`);
