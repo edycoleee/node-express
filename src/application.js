@@ -34,6 +34,7 @@ router.post('/pasien', (req, res, next) => {
     })
 })
 
+//Jalankan siswa router sebagai middleware router
 router.use("/siswa", SiswaRouter)
 
 app.use("/api", router)

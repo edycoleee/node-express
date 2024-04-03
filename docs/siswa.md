@@ -4,14 +4,6 @@
 
 Endpoint : GET /api/siswa
 
-Query params :
-
-- name : Search by first_name or last_name, using like, optional
-- email : Search by email using like, optional
-- phone : Search by phone using like, optional
-- page : number of page, default 1
-- size : size per page, default 10
-
 Response Body Success :
 
 ```json

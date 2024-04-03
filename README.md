@@ -294,17 +294,58 @@ describe('Test Untuk 1 dan 3', () => {
 ```
 
 ### 5. Membuat EndPoint CRUD Dokumentasi >> Object
-Dokumentasi pada file `.\docs\siswa.md`
+Dokumentasi pada file `.\docs\siswa.md` >> CRUD
+
+```
+1. READ : Endpoint : GET /api/siswa
+2. READ : Endpoint : GET /api/siswa/:id
+3. CREATE : Endpoint : POST /api/siswa
+4. DELETE : Endpoint : DELETE /api/siswa/:id
+5. UPDATE : Endpoint : PUT /api/siswa/:id
+```
+
 ### 6. GET Data SEARCH ALL (READ)
+- API SPEC
+`//docs/siswa.md`
+
+Endpoint : GET /api/siswa
+
+Response Body Success :
+
+```json
+{
+  "data": [
+    {
+      "id": 1,
+      "first_name": "Silmi",
+      "last_name": "Ayra",
+      "email": "silmi@gmail.com",
+      "phone": "32423423434"
+    },
+    {
+      "id": 2,
+      "first_name": "Nafi",
+      "last_name": "Dhafin",
+      "email": "afin@gmail.com",
+      "phone": "112233445566"
+    }
+  ]
+}
+```
+
 - Endpoint
+
+Install uuid >> npm install uuid
+
 ```
 //src/siswa.js
 import express from "express";
 import { v4 as uuid } from 'uuid';
 
+//membuat siswa router dari express router > export
 export const SiswaRouter = express.Router();
 
-//MOCKUP DATA OBYEK
+//0. MOCKUP DATA OBYEK (DATA SEMENTARA)
 let dbDataSiswa = [
   {
     "id": "1",
@@ -322,11 +363,29 @@ let dbDataSiswa = [
   }
 ]
 
-// 1. Search Siswa API
+// 1. READ : Endpoint : GET /api/siswa
 SiswaRouter.get('/', (req, res, next) => {
+  //kembalikan respon berupa json data siswa
   res.json({ data: dbDataSiswa })
 })
 ```
+
+- Jalankan siswa Router ke middleware application.js
+```
+//src/application.js
+import express from "express";
+import { SiswaRouter } from "./siswa.js";
+
+...............................................
+
+//Jalankan siswa router sebagai middleware router
+router.use("/siswa", SiswaRouter)
+
+app.use("/api", router)
+
+```
+
+
 - Request.rest Test
 ```
 ### 6. GET Data SEARCH ALL (READ)
@@ -334,12 +393,14 @@ GET http://localhost:3000/api/siswa
 ```
 - Unit Test
 ```
-//test/app.test.js
+//test/siswa.test.js
 const request = require('supertest');
 const { app } = require('../src/application');
 
-describe('Test Untuk 1 dan 3', () => {
+describe('TEST GET Endpoint 1', () => {
 
+    //data yang untuk membandingkan hasil test >> salah satu object dari response 
+    // kita coba data mockup object dengan id : 1
     const dataTest =   {
         "id": "1",
         "first_name": "Silmi",
@@ -350,12 +411,15 @@ describe('Test Untuk 1 dan 3', () => {
 
     //1. GET http://localhost:3000/api/siswa
     it('GET Data SEARCH ALL (READ)', async () => {
+        // kirim request ke server GET http://localhost:3000/api/siswa
         const getDataResponse  = await request(app).get('/api/siswa');
+        //cek log data response
         console.log(getDataResponse.body.data);
+        // Memeriksa response status = 200
         expect(getDataResponse.status).toBe(200);
-        // Memeriksa panjang array
+        // Memeriksa panjang array lebih dari 1 object panjangnya 
         expect(getDataResponse.body.data.length).toBeGreaterThan(0);
-         // Memeriksa isi array
+         // Memeriksa isi array apakah ada object seperti dataTest 
         expect(getDataResponse.body.data).toEqual(expect.arrayContaining([dataTest]));
       })
 })
@@ -363,21 +427,23 @@ describe('Test Untuk 1 dan 3', () => {
 ### 7. GET Data /id (READ)
 - Endpoint
 ```
-//2. Get Siswa API
+//2. READ : Endpoint : GET /api/siswa/:id >> menggunakan request.params.id
 SiswaRouter.get('/:id', (req, res, next) => {
-  //Fungsi Get Siswa by ID
+  //Panggil Fungsi Get Siswa by ID dengan mengirim id = req.params.id
   const dtSiswa = getdbSiswaId(req.params.id)
   //Jika data Kosong kirim pesan error
   if (!dtSiswa || dtSiswa.length === 0) {
+    // kirimkan respod status 404 dan json 
     return res.status(404).json({ "errors": "Siswa is not found" })
   }
-  //Jika data tdk kosong kirim respon datanya
+  //Jika data tdk kosong kirim respon datanya 
   res.json({ data: dtSiswa })
 })
 
-//Get Siswa by ID
+//Fungsi Get Siswa by ID ke object mockup database >> dbDataSiswa
 const getdbSiswaId = (id) => {
   //return dbDataSiswa.find((siswa) => siswa.id === parseInt(id))
+  // cari siswa di dbDataSiswa deengan siswa.id = id >> return hasilnya
   return dbDataSiswa.find((siswa) => siswa.id === id)
 }
 ```
@@ -390,10 +456,13 @@ GET http://localhost:3000/api/siswa/1
 ```
     //2. GET http://localhost:3000/api/siswa/1
     it('GET Data by ID (READ)', async () => {
+        //kirim request GET http://localhost:3000/api/siswa/1
         const getDataResponse  = await request(app).get('/api/siswa/1');
+        //tampilkan di log data
         console.log(getDataResponse.body.data);
+        // jika sukses maka response status = 200
         expect(getDataResponse.status).toBe(200);
-         // Memeriksa isi object
+         // Memeriksa isi object apakah isi datanya sama dengan dataTest
         expect(getDataResponse.body.data).toEqual(dataTest);
       })
 ```

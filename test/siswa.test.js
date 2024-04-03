@@ -1,27 +1,32 @@
-//test/app.test.js
+//test/siswa.test.js
 const request = require('supertest');
 const { app } = require('../src/application');
 
 describe('Test Untuk 1 dan 3', () => {
 
-    const dataTest = {
+    //data yang untuk membandingkan hasil test >> salah satu object dari response 
+    // kita coba data mockup object dengan id : 1
+    const dataTest =   {
         "id": "1",
         "first_name": "Silmi",
         "last_name": "Ayra",
         "email": "silmi@gmail.com",
         "phone": "32423423434"
-    }
+      }
 
     //1. GET http://localhost:3000/api/siswa
     it('GET Data SEARCH ALL (READ)', async () => {
-        const getDataResponse = await request(app).get('/api/siswa');
+        // kirim request ke server GET http://localhost:3000/api/siswa
+        const getDataResponse  = await request(app).get('/api/siswa');
+        //cek log data response
         console.log(getDataResponse.body.data);
+        // Memeriksa response status = 200
         expect(getDataResponse.status).toBe(200);
-        // Memeriksa panjang array
+        // Memeriksa panjang array lebih dari 1 object panjangnya 
         expect(getDataResponse.body.data.length).toBeGreaterThan(0);
-        // Memeriksa isi array
+         // Memeriksa isi array apakah ada object seperti dataTest 
         expect(getDataResponse.body.data).toEqual(expect.arrayContaining([dataTest]));
-    })
+      })
 
     //2. GET http://localhost:3000/api/siswa/1
     it('GET Data by ID (READ)', async () => {
