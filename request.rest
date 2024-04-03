@@ -16,10 +16,10 @@ Content-Type: application/json
 ### 6. GET Data SEARCH ALL (READ) 
 GET http://localhost:3000/api/siswa
 
-### 7. GET Data /id (READ) 
+### 7. GET Data /id (READ)
 GET http://localhost:3000/api/siswa/1
 
-### 8. POST Data (CREATE) 
+### 8. POST Data (CREATE)
 POST http://localhost:3000/api/siswa 
 Content-Type: application/json
 
@@ -31,9 +31,9 @@ Content-Type: application/json
 }
 
 ### 9. DELETE Data /id (DELETE) 
-DELETE http://localhost:3000/api/siswa/1
+DELETE http://localhost:3000/api/siswa/14
 
-### 10. PUT Data /id (UPDATE) 
+### 10. PUT Data /id (UPDATE)
 PUT http://localhost:3000/api/siswa/1 
 Content-Type: application/json
 

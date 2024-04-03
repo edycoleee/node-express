@@ -108,14 +108,7 @@ Response Body Success :
 
 ```json
 {
-  "data": {
-    {
-  "first_name": "Silmi",
-  "last_name": "Ayra",
-  "email": "silmi@gmail.com",
-  "phone": "32423423434"
-}
-  }
+  "errors": "Deleted Successfully"
 }
 ```
 
@@ -148,8 +141,8 @@ Response Body Success :
 {
   "data": {
     "id": 1,
-    "first_name": "Silmi",
-    "last_name": "Ayra",
+    "first_name": "Silmi-Rev",
+    "last_name": "Ayra-Rev",
     "email": "silmi@gmail.com",
     "phone": "32423423434"
   }

@@ -524,13 +524,13 @@ describe('TEST REST FULL API', () => {
 SiswaRouter.get('/', async (req, res, next) => {
     try {
         const rows = await query('SELECT * FROM tbsiswa')
-        console.log(`GET DATA: ${rows}`);
-        res.status(200).json(rows)
-      } catch (error) {
-        logger.error(`Error: ${error.message}`);
+        console.log(`GET DATA:${JSON.stringify(rows)}`);
+        res.status(200).json({'data' : rows})
+    } catch (error) {
+        console.log(`Error: ${error.message}`);
         res.status(500).send('Internal Server Error');
-      }
-  })
+    }
+})
 ```
 - .REST
 ```
@@ -551,26 +551,26 @@ GET http://localhost:3000/api/siswa
     it('GET Data SEARCH ALL (READ)', async () => {
         const getDataResponse = await request(app).get('/api/siswa');
         // Memeriksa panjang array
-        expect(getDataResponse.body.length).toBeGreaterThan(0);
+        expect(getDataResponse.body.data.length).toBeGreaterThan(0);
         // Memeriksa isi array
-        expect(getDataResponse.body).toEqual(expect.arrayContaining([dataTest]));
+        expect(getDataResponse.body.data).toEqual(expect.arrayContaining([dataTest]));
     })
 ```
 ### 9. GET Data /id (READ)
 - ROUTING
 ```
 //2. Get Siswa API by ID
-SiswaRouter.get('/:id',async (req, res, next) => {
+SiswaRouter.get('/:id', async (req, res, next) => {
     try {
         const { id } = req.params;
         const rows = await query('SELECT * FROM tbsiswa WHERE id = ?', [id])
-        console.log(`GET DATA: ${rows}`);
-        res.status(200).json(rows)
-      } catch (error) {
-        logger.error(`Error: ${error.message}`);
+        console.log(`GET DATA: ${JSON.stringify(rows)}`);
+        res.status(200).json({'data' : rows[0]})
+    } catch (error) {
+        console.log(`Error: ${error.message}`);
         res.status(500).send('Internal Server Error');
-      }
-  })
+    }
+})
 ```
 - .REST
 ```
@@ -584,45 +584,176 @@ GET http://localhost:3000/api/siswa/1
         const getDataResponse = await request(app).get('/api/siswa/1');
         expect(getDataResponse.status).toBe(200);
         // Memeriksa isi object
-        expect(getDataResponse.body).toEqual(dataTest);
+        expect(getDataResponse.body.data).toEqual(dataTest);
     })
 ```
 ### 10. POST Data (CREATE)
 - ROUTING
 ```
-
+//3. Create Siswa API
+SiswaRouter.post('/', async (req, res, next) => {
+    try {
+        // Data valid, lanjutkan proses
+        const { first_name, last_name, email, phone } = req.body;
+        const results = await query('INSERT INTO tbsiswa (first_name,last_name,email,phone) VALUES (?, ?, ?,?)', [first_name, last_name, email, phone]);
+        const id = results.insertId
+        //console.log(results.insertId);
+        const rows = await query('SELECT * FROM tbsiswa WHERE id = ?', [id]);
+        console.log(`POST NEW DATA: ${JSON.stringify(rows)}`);
+        res.status(201).send({ 'data': rows[0] });
+    } catch (error) {
+        console.log(`Error: ${error.message}`);
+        res.status(500).send('Internal Server Error');
+    }
+})
 ```
 - .REST
 ```
+### 8. POST Data (CREATE)
+POST http://localhost:3000/api/siswa 
+Content-Type: application/json
 
+{
+"first_name": "Edy", 
+"last_name": "Kholid", 
+"email": "edy@gmail.com", 
+"phone": "8787878787"
+}
 ```
 - UNIT TEST
 ```
-
+    //3. POST http://localhost:3000/api/siswa
+    it.skip('POST Data (CREATE)', async () => {
+        const dataKirim = {
+            "first_name": "Edy",
+            "last_name": "Kholid",
+            "email": "edy@gmail.com",
+            "phone": "8787878787"
+        }
+        const getDataResponse = await request(app)
+            .post('/api/siswa')
+            .send(dataKirim);
+        expect(getDataResponse.status).toBe(201);
+        // Memeriksa bahwa respons adalah sebuah objek
+        expect(getDataResponse.body.data).toBeInstanceOf(Object);
+        // Memeriksa apakah objek mengandung nilai tertentu
+        expect(getDataResponse.body.data).toEqual(expect.objectContaining({ "first_name": "Edy" }));
+    })
 ```
 ### 11. DELETE Data /id (DELETE)
 - ROUTING
 ```
+//4. Remove Siswa API
+SiswaRouter.delete('/:id', async (req, res, next) => {
+    try {
 
+        const { id } = req.params;
+        //check data jika ada
+
+        //delete data
+        const result = await query('DELETE FROM tbsiswa WHERE id = ?', [id]);
+        let message = 'Error in delete';
+        if (result.affectedRows) {
+            message = 'Deleted Successfully';
+        }
+        console.log(`DELETE DATA: ${id}`);
+        return res.status(200).send(message);
+    } catch (error) {
+        console.log(`Error: ${error.message}`);
+        res.status(500).send('Internal Server Error');
+    }
+})
 ```
 - .REST
 ```
-
+### 9. DELETE Data /id (DELETE) 
+DELETE http://localhost:3000/api/siswa/14
 ```
 - UNIT TEST
 ```
+    //4. DELETE http://localhost:3000/api/siswa/1
+    it.skip('DELETE Data by Id (DELETE)', async () => {
 
+        //insert data
+        const dataInsert = ["test", "test", "test@gmail.com", "080900000"]
+        const results = await query('INSERT INTO tbsiswa (first_name,last_name,email,phone) VALUES (?, ?, ?,?)', dataInsert);
+        const idData = results.insertId
+
+        const getDataResponse = await request(app).delete(`/api/siswa/${idData}`);
+        expect(getDataResponse.status).toBe(200);
+        expect(getDataResponse.text).toBe('Deleted Successfully');
+    })
 ```
 ### 12. PUT Data /id (UPDATE)
 - ROUTING
 ```
+//5. Update Siswa API
+SiswaRouter.put('/:id',async  (req, res, next) => {
+    console.log(req.params,req.body);
+    try {
+        const { id } = req.params
 
+        const { first_name, last_name, email, phone } = req.body;
+        await query('UPDATE tbsiswa SET first_name=?, last_name=? ,email=? ,phone=? WHERE id=?', [first_name, last_name, email, phone,id]);
+        
+        const rows = await query('SELECT * FROM tbsiswa WHERE id = ?', [id]);
+        console.log(`POST NEW DATA: ${JSON.stringify(rows)}`);
+        
+        res.status(201).send({ 'data': rows[0] });
+    } catch (error) {
+        console.log(`Error: ${error.message}`);
+        res.status(500).send('Internal Server Error');
+    }
+
+})
 ```
 - .REST
 ```
+### 10. PUT Data /id (UPDATE)
+PUT http://localhost:3000/api/siswa/1 
+Content-Type: application/json
 
+{
+"first_name": "Silmi-Rev", 
+"last_name": "Ayra-Rev", 
+"email": "silmi@gmail.com", 
+"phone": "32423423434"
+
+}
 ```
 - UNIT TEST
 ```
+describe('PUT /api/siswa/:id', function () {
 
+    let idData
+    beforeEach(async () => {
+        const dataInsert = ["Silmi", "Ayra", "test@gmail.com", "32423423434"]
+        const results = await query('INSERT INTO tbsiswa (first_name,last_name,email,phone) VALUES (?, ?, ?,?)', dataInsert);
+        idData = results.insertId
+    })
+
+    afterEach(async () => {
+        await query('DELETE FROM tbsiswa WHERE id = ?', [idData]);
+    })
+
+    //5. PUT http://localhost:3000/api/siswa/1
+    it('PUT Data (UPDATE)', async () => {
+        const dataKirim = {
+            "first_name": "Silmi-Rev",
+            "last_name": "Ayra-Rev",
+            "email": "silmi@gmail.com",
+            "phone": "32423423434"
+        }
+        const getDataResponse = await request(app)
+            .put(`/api/siswa/${idData}`)
+            .send(dataKirim);
+        expect(getDataResponse.status).toBe(201);
+        expect(getDataResponse.body.data.id).toBe(idData);
+        expect(getDataResponse.body.data.first_name).toBe("Silmi-Rev");
+        expect(getDataResponse.body.data.last_name).toBe("Ayra-Rev");
+        expect(getDataResponse.body.data.email).toBe("silmi@gmail.com");
+        expect(getDataResponse.body.data.phone).toBe("32423423434");
+    })
+
+})
 ```
