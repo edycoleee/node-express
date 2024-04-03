@@ -2,7 +2,7 @@
 
 ## 1. PERSIAPAN
 
-```
+```json
 //Membuat Repo di github
 repository
 https://github.com/edycoleee/node-express
@@ -98,7 +98,7 @@ Application secara default tidak berjalan, jika kita ingin menjalankan Applicati
 Dimana port adalah nomor port yang ingin kita gunakan untuk menjalankan web nya
 Pastikan port yang kita pilih tidak bentrok dengan aplikasi lain
 
-```
+```json
 //src/index.js
 import express from "express";
 
@@ -118,7 +118,7 @@ app.listen(PORT, () => {
 
 - Memisahkan index.js dan application.js ,untuk memudahkan pengetesan dengan unit test
 
-```
+```json
 //src/index.js
 import { app } from "./application.js";
 
@@ -132,7 +132,7 @@ app.listen(PORT, () => {
 
 - endpoint GET http://localhost:3000/
 
-```
+```json
 //src/application.js
 import express from "express";
 
@@ -149,7 +149,7 @@ app.get('/', (req, res) => {
 
 - melakukan pengetesan dengan request.rest
 
-```
+```json
 ###
 GET http://localhost:3000/
 
@@ -158,7 +158,7 @@ GET http://localhost:3000/
 
 - melakukan pengetesan dengan unit test
 
-```
+```json
 //test/app.test.js
 const request = require('supertest');
 const { app } = require('../src/application');
@@ -180,7 +180,7 @@ describe('GET /', () => {
 
 - end point GET http://localhost:3000/oby
 
-```
+```json
 //src/application.js
 import express from "express";
 
@@ -212,14 +212,14 @@ router.get('/oby', (req, res, next) => {
 
 - test rest
 
-```
+```json
 ###
 GET http://localhost:3000/oby
 ```
 
 - unit test
 
-```
+```json
 //Test GET http://localhost:3000/oby
 test("Test GET /oby", async () => {
   //Cek response Object >> body >> toEqual
@@ -238,7 +238,7 @@ test("Test GET /oby", async () => {
 
 - endpoint POST http://localhost:3000/api/pasien
 
-```
+```json
 //3. Contoh Endpoint API >> POST /api/pasien >> Req Body >> Res Body
 router.post('/pasien', (req, res, next) => {
     res.json({
@@ -251,7 +251,7 @@ app.use("/api", router)
 
 - request test
 
-```
+```json
 ###
 POST http://localhost:3000/api/pasien
 Content-Type: application/json
@@ -264,7 +264,7 @@ Content-Type: application/json
 
 - unit test
 
-```
+```json
 describe('Test Untuk 1 dan 3', () => {
 
   //1. test GET http://localhost:3000
@@ -337,7 +337,7 @@ Response Body Success :
 
 Install uuid >> npm install uuid
 
-```
+```json
 //src/siswa.js
 import express from "express";
 import { v4 as uuid } from 'uuid';
@@ -371,7 +371,7 @@ SiswaRouter.get('/', (req, res, next) => {
 ```
 
 - Jalankan siswa Router ke middleware application.js
-```
+```json
 //src/application.js
 import express from "express";
 import { SiswaRouter } from "./siswa.js";
@@ -392,7 +392,7 @@ app.use("/api", router)
 GET http://localhost:3000/api/siswa
 ```
 - Unit Test
-```
+```json
 //test/siswa.test.js
 const request = require('supertest');
 const { app } = require('../src/application');
@@ -426,7 +426,7 @@ describe('TEST GET Endpoint 1', () => {
 ```
 ### 7. GET Data /id (READ)
 - Endpoint
-```
+```json
 //2. READ : Endpoint : GET /api/siswa/:id >> menggunakan request.params.id
 SiswaRouter.get('/:id', (req, res, next) => {
   //Panggil Fungsi Get Siswa by ID dengan mengirim id = req.params.id
@@ -453,7 +453,7 @@ const getdbSiswaId = (id) => {
 GET http://localhost:3000/api/siswa/1
 ```
 - Unit Test
-```
+```json
     //2. GET http://localhost:3000/api/siswa/1
     it('GET Data by ID (READ)', async () => {
         //kirim request GET http://localhost:3000/api/siswa/1
@@ -468,7 +468,7 @@ GET http://localhost:3000/api/siswa/1
 ```
 ### 8. POST Data (CREATE)
 - Endpoint
-```
+```json
 //3. Create Siswa API
 SiswaRouter.post('/', (req, res, next) => {
   const dataReq = req.body;
