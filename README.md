@@ -99,17 +99,19 @@ Application secara default tidak berjalan, jika kita ingin menjalankan Applicati
 Dimana port adalah nomor port yang ingin kita gunakan untuk menjalankan web nya
 Pastikan port yang kita pilih tidak bentrok dengan aplikasi lain
 
+#### JALANKAN SERVER NODEJS DENGAN EXPRESS
+
 ```
 //src/index.js
 import express from "express";
 
-//membuat object app dari express
+//a. membuat object app dari express
 export const app = express();
 
-// Jalankan server
+//b. Jalankan server
 const PORT = process.env.PORT || 3000;
 
-//listen request app pada port >> 3000
+//c. listen request app pada port >> 3000
 app.listen(PORT, () => {
   console.log(`Server started on port ${PORT}`);
 });
@@ -119,15 +121,26 @@ app.listen(PORT, () => {
 
 ## 3. Basic Testing
 
+Belajar membuat endpoint request dan response
+
+1. Endpoint GET http://localhost:3000/ > Request => Response send String
+2. Endpoint GET http://localhost:3000/oby > Request => Response json Object
+3. Endpoint POST http://localhost:3000/api/pasien > Request+Body => Response json Object
+
+Untuk pertama kita buat : 
+
+#### 1. Endpoint GET http://localhost:3000/ > Request => Response send String
+
 - Memisahkan index.js dan application.js ,untuk memudahkan pengetesan dengan unit test
 
 ```
 //src/index.js
 import { app } from "./application.js";
 
+//variabel PORT 
 const PORT = process.env.PORT || 3000;
 
-//1. Jalankan server liste port >> 3000
+//c. Jalankan server liste port >> 3000
 app.listen(PORT, () => {
     console.log(`Server started on port ${PORT}`);
 });
@@ -145,7 +158,7 @@ export const app = express();
 //b. jalankan middleware json express
 app.use(express.json());
 
-//2. Contoh Endpoint API
+//1. Contoh Endpoint API
 app.get('/', (req, res) => {
     console.log('Hello World requested');
     res.send('Hello World!');
@@ -183,7 +196,9 @@ describe('TEST GET http://localhost:3000/', () => {
 //npx jest app.test.js
 ```
 
-4. Basic Routing
+## 4. Basic Routing
+
+### 2. Endpoint GET http://localhost:3000/oby > Request => Response json Object
 
 - end point GET http://localhost:3000/oby
 
