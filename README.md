@@ -25,6 +25,8 @@ npm install @babel/plugin-transform-runtime --save-dev
 npm install jest supertest @types/jest --save-dev
 npm install --save-dev nodemon
 npm install winston winston-daily-rotate-file
+npm install joi
+npm install mysql2
 
 //Edit file package.json
 
@@ -101,11 +103,13 @@ Pastikan port yang kita pilih tidak bentrok dengan aplikasi lain
 //src/index.js
 import express from "express";
 
+//membuat object app dari express
 export const app = express();
 
 // Jalankan server
 const PORT = process.env.PORT || 3000;
 
+//listen request app pada port >> 3000
 app.listen(PORT, () => {
   console.log(`Server started on port ${PORT}`);
 });
@@ -121,9 +125,9 @@ app.listen(PORT, () => {
 //src/index.js
 import { app } from "./application.js";
 
-//1. Jalankan server
 const PORT = process.env.PORT || 3000;
 
+//1. Jalankan server liste port >> 3000
 app.listen(PORT, () => {
     console.log(`Server started on port ${PORT}`);
 });
@@ -135,8 +139,10 @@ app.listen(PORT, () => {
 //src/application.js
 import express from "express";
 
+//a. membuat object app dari express
 export const app = express();
 
+//b. jalankan middleware json express
 app.use(express.json());
 
 //2. Contoh Endpoint API
@@ -149,10 +155,9 @@ app.get('/', (req, res) => {
 - melakukan pengetesan dengan request.rest
 
 ```
-###
+### TEST request GET ke http://localhost:3000/
 GET http://localhost:3000/
 
-###
 ```
 
 - melakukan pengetesan dengan unit test
@@ -161,12 +166,15 @@ GET http://localhost:3000/
 //test/app.test.js
 const request = require('supertest');
 const { app } = require('../src/application');
-//const { app } = require('../src');
 
-describe('GET /', () => {
-  it('should return Hello World', async () => {
+//a. fungsi testing dengan describe >> it
+describe('TEST GET http://localhost:3000/', () => {
+  it('Mendapatkan return Hello World', async () => {
+    //b. lakukan request "/" dan tangkap hasilnya ke variable response
     const response = await request(app).get('/');
+    //c. Jika request berhasil ke server maka status response = 200
     expect(response.status).toBe(200);
+    //d. Periksa isi response seharusnya 'Hello World!'
     expect(response.text).toBe('Hello World!');
   });
 });
