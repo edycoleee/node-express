@@ -293,7 +293,46 @@ describe('Test Untuk 1 dan 3', () => {
 });
 ```
 
+### LATIHAN : BUATLAH API TESTING
+
+Belajar membuat endpoint request dan response
+
+1. Endpoint GET http://localhost:3000/api/coba/ > Request => Response send String
+
+Response Body Success :
+
+```json
+"HELLO LATIHAN !"
+```
+
+2. Endpoint GET http://localhost:3000/api/coba/oby > Request => Response json Object
+   Response Body Success :
+
+```json
+{
+  "message": "GET Data Object Sukses",
+  "data": {
+    "kodeBarang": "001A",
+    "namaBarang": "Komputer"
+  }
+}
+```
+
+3. Endpoint POST http://localhost:3000/api/coba/pasien > Request+Body => Response json Object
+   Response Body Success :
+
+```json
+{
+  "message": "POST Data Pasien Sukses",
+  "data": {
+    "noRM": "555B01",
+    "namaPasien": "Silmi Ayra"
+  }
+}
+```
+
 ### 5. Membuat EndPoint CRUD Dokumentasi >> Object
+
 Dokumentasi pada file `.\docs\siswa.md` >> CRUD
 
 ```
@@ -305,8 +344,9 @@ Dokumentasi pada file `.\docs\siswa.md` >> CRUD
 ```
 
 ### 6. GET Data SEARCH ALL (READ)
+
 - API SPEC
-`//docs/siswa.md`
+  `//docs/siswa.md`
 
 Endpoint : GET /api/siswa
 
@@ -371,6 +411,7 @@ SiswaRouter.get('/', (req, res, next) => {
 ```
 
 - Jalankan siswa Router ke middleware application.js
+
 ```
 //src/application.js
 import express from "express";
@@ -385,13 +426,15 @@ app.use("/api", router)
 
 ```
 
-
 - Request.rest Test
+
 ```
 ### 6. GET Data SEARCH ALL (READ)
 GET http://localhost:3000/api/siswa
 ```
+
 - Unit Test
+
 ```
 //test/siswa.test.js
 const request = require('supertest');
@@ -399,7 +442,7 @@ const { app } = require('../src/application');
 
 describe('TEST GET Endpoint 1', () => {
 
-    //data yang untuk membandingkan hasil test >> salah satu object dari response 
+    //data yang untuk membandingkan hasil test >> salah satu object dari response
     // kita coba data mockup object dengan id : 1
     const dataTest =   {
         "id": "1",
@@ -417,15 +460,18 @@ describe('TEST GET Endpoint 1', () => {
         console.log(getDataResponse.body.data);
         // Memeriksa response status = 200
         expect(getDataResponse.status).toBe(200);
-        // Memeriksa panjang array lebih dari 1 object panjangnya 
+        // Memeriksa panjang array lebih dari 1 object panjangnya
         expect(getDataResponse.body.data.length).toBeGreaterThan(0);
-         // Memeriksa isi array apakah ada object seperti dataTest 
+         // Memeriksa isi array apakah ada object seperti dataTest
         expect(getDataResponse.body.data).toEqual(expect.arrayContaining([dataTest]));
       })
 })
 ```
+
 ### 7. GET Data /id (READ)
+
 - Endpoint
+
 ```
 //2. READ : Endpoint : GET /api/siswa/:id >> menggunakan request.params.id
 SiswaRouter.get('/:id', (req, res, next) => {
@@ -433,10 +479,10 @@ SiswaRouter.get('/:id', (req, res, next) => {
   const dtSiswa = getdbSiswaId(req.params.id)
   //Jika data Kosong kirim pesan error
   if (!dtSiswa || dtSiswa.length === 0) {
-    // kirimkan respod status 404 dan json 
+    // kirimkan respod status 404 dan json
     return res.status(404).json({ "errors": "Siswa is not found" })
   }
-  //Jika data tdk kosong kirim respon datanya 
+  //Jika data tdk kosong kirim respon datanya
   res.json({ data: dtSiswa })
 })
 
@@ -447,12 +493,16 @@ const getdbSiswaId = (id) => {
   return dbDataSiswa.find((siswa) => siswa.id === id)
 }
 ```
+
 - Request.rest Test
+
 ```
 ### 7. GET Data /id (READ)
 GET http://localhost:3000/api/siswa/1
 ```
+
 - Unit Test
+
 ```
     //2. GET http://localhost:3000/api/siswa/1
     it('GET Data by ID (READ)', async () => {
@@ -466,8 +516,11 @@ GET http://localhost:3000/api/siswa/1
         expect(getDataResponse.body.data).toEqual(dataTest);
       })
 ```
+
 ### 8. CREATE : Endpoint : POST /api/siswa
+
 - Endpoint
+
 ```
 //3. CREATE : Endpoint : POST /api/siswa >> ambil req body >> simpan ke data siswa
 SiswaRouter.post('/', (req, res, next) => {
@@ -490,7 +543,9 @@ SiswaRouter.post('/', (req, res, next) => {
   res.json({ data: dataRespon })
 })
 ```
+
 - Request.rest Test
+
 ```
 ### 8. POST Data (CREATE)
 POST http://localhost:3000/api/siswa
@@ -504,7 +559,9 @@ Content-Type: application/json
 }
 
 ```
+
 - Unit Test
+
 ```
     //3. POST http://localhost:3000/api/siswa
     it('POST Data (CREATE)', async () => {
@@ -519,7 +576,7 @@ Content-Type: application/json
         const response = await request(app)
             //kirim request  POST http://localhost:3000/api/siswa
             .post('/api/siswa')
-            //kirim data kedalam request body 
+            //kirim data kedalam request body
             .send(dataKirim);
         //respose status sama 200
         expect(response.status).toBe(200);
@@ -529,8 +586,11 @@ Content-Type: application/json
         expect(response.body.data).toEqual(expect.objectContaining({ "first_name": "Edy" }));
     })
 ```
+
 ### 9. DELETE Data /id (DELETE)
+
 - Endpoint
+
 ```
 //4. DELETE : Endpoint : DELETE /api/siswa/:id >> filter data yang bukan id(req.params.id) yg dikirim
 SiswaRouter.delete('/:id', (req, res, next) => {
@@ -557,13 +617,17 @@ SiswaRouter.delete('/:id', (req, res, next) => {
   }
 })
 ```
+
 - Request.rest Test
+
 ```
 ### 9. DELETE Data /id (DELETE)
 DELETE http://localhost:3000/api/siswa/1
 
 ```
+
 - Unit Test
+
 ```
     //4. DELETE http://localhost:3000/api/siswa/1
     it('DELETE Data by Id (DELETE)', async () => {
@@ -578,8 +642,11 @@ DELETE http://localhost:3000/api/siswa/1
     })
 
 ```
+
 ### 10. PUT Data /id (UPDATE)
+
 - Endpoint
+
 ```
 //5. UPDATE : Endpoint : PUT /api/siswa/:id
 SiswaRouter.put('/:id', (req, res, next) => {
@@ -608,12 +675,14 @@ SiswaRouter.put('/:id', (req, res, next) => {
   updatedbSiswa(idEdit, bodySiswa)
   //cari data siswa dengan idEdit
   const dataRespon = getdbSiswaId(idEdit)
-  //kirimkan respon json data yang telah di edit dari hasil pencarian 
+  //kirimkan respon json data yang telah di edit dari hasil pencarian
   res.json({ data: dataRespon })
 })
 
 ```
+
 - Request.rest Test
+
 ```
 ### 10. PUT Data /id (UPDATE)
 PUT http://localhost:3000/api/siswa/1
@@ -626,7 +695,9 @@ Content-Type: application/json
     "phone": "32423423434"
   }
 ```
+
 - Unit Test
+
 ```
     //5. PUT http://localhost:3000/api/siswa/1
     it('POST Data (CREATE)', async () => {
