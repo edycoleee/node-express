@@ -124,9 +124,22 @@ app.listen(PORT, () => {
 Belajar membuat endpoint request dan response
 
 1. Endpoint GET http://localhost:3000/ > Request => Response send String
-2. Endpoint GET http://localhost:3000/oby > Request => Response json Object
-3. Endpoint POST http://localhost:3000/api/pasien > Request+Body => Response json Object
 
+Response Body Success :
+```json
+'Hello World!'
+```
+
+2. Endpoint GET http://localhost:3000/oby > Request => Response json Object
+Response Body Success :
+```json
+
+```
+3. Endpoint POST http://localhost:3000/api/pasien > Request+Body => Response json Object
+Response Body Success :
+```json
+
+```
 Untuk pertama kita buat : 
 
 #### 1. Endpoint GET http://localhost:3000/ > Request => Response send String
@@ -206,24 +219,31 @@ describe('TEST GET http://localhost:3000/', () => {
 //src/application.js
 import express from "express";
 
+//a. membuat object app dari express
 export const app = express();
 
+//b. jalankan middleware json express
 app.use(express.json());
 
-//1. Contoh Endpoint API >> GET / >> Response Text
+//1. Contoh Endpoint API
 app.get('/', (req, res) => {
     console.log('Hello World requested');
     res.send('Hello World!');
 });
 
 //2. Contoh Endpoint API >> GET /oby >> Response Object dg router
+//membuat object router dari express
 export const router = express.Router();
+//jalankan middleware router
 app.use(router)
+//data object yang akan di kirim ke respon json
 const dtpasien1 = {
     nama: "Edy",
     alamat: "Semarang"
 }
+//routing untuk http://localhost:3000/oby
 router.get('/oby', (req, res, next) => {
+  // response json data
     res.json({
         message: 'GET Data Pasien Sukses',
         data: dtpasien1
