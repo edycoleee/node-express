@@ -704,7 +704,7 @@ GET http://localhost:3000/api/siswa
 
 ### 9. GET Data /id (READ)
 
-- Perintah SQL : SELECT \* FROM tabel WHERE kolom = ygdicari
+- Perintah SQL : `'SELECT * FROM tabel WHERE kolom = ?' , [data]`
 - API SPEC
   `//docs/siswa.md`
 
@@ -732,7 +732,7 @@ SiswaRouter.get('/:id', async (req, res, next) => {
     try {
         //ambil id dari request params
         const { id } = req.params;
-        //Perintah Query SQL ke database >> SELECT * FROM tabel WHERE kolom = ygdicari
+        //Perintah Query SQL ke database >> 'SELECT * FROM tabel WHERE kolom = ?' , [data]
         const rows = await query('SELECT * FROM tbsiswa WHERE id = ?', [id])
         //tampilkan di log
         console.log(`GET DATA: ${JSON.stringify(rows)}`);
@@ -768,7 +768,7 @@ GET http://localhost:3000/api/siswa/1
 
 ### 10. POST Data (CREATE)
 
-- Perintah SQL : INSERT INTO tabel (kolom) VALUES (?)', [data kirim]
+- Perintah SQL : `'INSERT INTO tabel (kolom) VALUES (?)', [data kirim]`
 
 - API SPEC
   `//docs/siswa.md`
@@ -857,7 +857,7 @@ Content-Type: application/json
 
 ### 11. DELETE Data /id (DELETE)
 
-- Perintah SQL : DELETE FROM tabel WHERE kolom = ?', [data]
+- Perintah SQL : `'DELETE FROM tabel WHERE kolom = ?', [data]`
 
 - API SPEC
   `//docs/siswa.md`
@@ -935,7 +935,7 @@ DELETE http://localhost:3000/api/siswa/2
 
 ### 12. PUT Data /id (UPDATE)
 
-- Perintah SQL : UPDATE tabel SET kolom=?', [data]
+- Perintah SQL : `'UPDATE tabel SET kolom=?', [data]`
 
 - API SPEC
   `//docs/siswa.md`
