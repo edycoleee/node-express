@@ -470,6 +470,25 @@ describe('TEST GET Endpoint 1', () => {
 
 ### 7. GET Data /id (READ)
 
+- API SPEC
+  `//docs/siswa.md`
+
+READ : Endpoint : GET /api/siswa/:id
+
+Response Body Success :
+
+```json
+{
+  "data": {
+    "id": "1",
+    "first_name": "Silmi",
+    "last_name": "Ayra",
+    "email": "silmi@gmail.com",
+    "phone": "32423423434"
+  }
+}
+```
+
 - Endpoint
 
 ```
@@ -518,6 +537,25 @@ GET http://localhost:3000/api/siswa/1
 ```
 
 ### 8. CREATE : Endpoint : POST /api/siswa
+
+- API SPEC
+  `//docs/siswa.md`
+
+CREATE : Endpoint : POST /api/siswa
+
+Response Body Success :
+
+```json
+{
+  "data": {
+    "first_name": "Edy",
+    "last_name": "Kholid",
+    "email": "edy@gmail.com",
+    "phone": "8787878787",
+    "id": "114062fd-05a5-4bf1-8fbc-c7debb767115"
+  }
+}
+```
 
 - Endpoint
 
@@ -589,6 +627,27 @@ Content-Type: application/json
 
 ### 9. DELETE Data /id (DELETE)
 
+- API SPEC
+  `//docs/siswa.md`
+
+DELETE : Endpoint : DELETE /api/siswa/:id
+
+Response Body Success :
+
+```json
+{
+  "data": [
+    {
+      "id": "2",
+      "first_name": "Nafi",
+      "last_name": "Dhafin",
+      "email": "afin@gmail.com",
+      "phone": "112233445566"
+    }
+  ]
+}
+```
+
 - Endpoint
 
 ```
@@ -644,6 +703,27 @@ DELETE http://localhost:3000/api/siswa/1
 ```
 
 ### 10. PUT Data /id (UPDATE)
+
+RESTART SERVER DULU YA...
+
+- API SPEC
+  `//docs/siswa.md`
+
+UPDATE : Endpoint : PUT /api/siswa/:id
+
+Response Body Success :
+
+```json
+{
+  "data": {
+    "id": "1",
+    "first_name": "Silmi-Rev",
+    "last_name": "Ayra-Rev",
+    "email": "silmi@gmail.com",
+    "phone": "32423423434"
+  }
+}
+```
 
 - Endpoint
 
