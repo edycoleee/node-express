@@ -475,26 +475,31 @@ export const SiswaRouter = express.Router();
 
 // 1. READ : Endpoint : GET /api/siswa
 SiswaRouter.get('/', (req, res, next) => {
+    //SELECT * FROM tabel
     res.send("GET ALL SISWA")
   })
 
 //2. READ : Endpoint : GET /api/siswa/:id
 SiswaRouter.get('/:id', (req, res, next) => {
+    //SELECT * FROM tabel WHERE kolom = ygdicari
     res.send("GET SISWA")
   })
 
 //3. CREATE : Endpoint : POST /api/siswa
 SiswaRouter.post('/', (req, res, next) => {
+    //INSERT INTO tabel (kolom) VALUES (?)', [data kirim]
     res.send("ADD NEW SISWA")
   })
 
 //4. DELETE : Endpoint : DELETE /api/siswa/:id
 SiswaRouter.delete('/:id', (req, res, next) => {
+    //DELETE FROM tabel WHERE kolom = ?', [data]
     res.send("DELETE SISWA")
   })
 
 //5. UPDATE : Endpoint : PUT /api/siswa/:id
 SiswaRouter.put('/:id', (req, res, next) => {
+    //UPDATE tabel SET kolom=?', [data]
     res.send("UPDATE SISWA")
 })
 ```
@@ -619,6 +624,8 @@ describe('TEST REST FULL API', () => {
 
 ### 8. GET Data ALL (READ)
 
+- Perintah SQL : `SELECT * FROM tabel`
+
 - API SPEC
   `//docs/siswa.md`
 
@@ -697,6 +704,7 @@ GET http://localhost:3000/api/siswa
 
 ### 9. GET Data /id (READ)
 
+- Perintah SQL : SELECT \* FROM tabel WHERE kolom = ygdicari
 - API SPEC
   `//docs/siswa.md`
 
@@ -759,6 +767,8 @@ GET http://localhost:3000/api/siswa/1
 ```
 
 ### 10. POST Data (CREATE)
+
+- Perintah SQL : INSERT INTO tabel (kolom) VALUES (?)', [data kirim]
 
 - API SPEC
   `//docs/siswa.md`
@@ -847,6 +857,8 @@ Content-Type: application/json
 
 ### 11. DELETE Data /id (DELETE)
 
+- Perintah SQL : DELETE FROM tabel WHERE kolom = ?', [data]
+
 - API SPEC
   `//docs/siswa.md`
 
@@ -922,6 +934,8 @@ DELETE http://localhost:3000/api/siswa/2
 ```
 
 ### 12. PUT Data /id (UPDATE)
+
+- Perintah SQL : UPDATE tabel SET kolom=?', [data]
 
 - API SPEC
   `//docs/siswa.md`
