@@ -25,6 +25,7 @@ npm install @babel/plugin-transform-runtime --save-dev
 npm install jest supertest @types/jest --save-dev
 npm install --save-dev nodemon
 npm install winston winston-daily-rotate-file
+npm install mysql2
 
 //Edit file package.json
 
@@ -97,15 +98,19 @@ Application secara default tidak berjalan, jika kita ingin menjalankan Applicati
 Dimana port adalah nomor port yang ingin kita gunakan untuk menjalankan web nya
 Pastikan port yang kita pilih tidak bentrok dengan aplikasi lain
 
+#### JALANKAN SERVER NODEJS DENGAN EXPRESS
+
 ```
 //src/index.js
 import express from "express";
 
+//a. membuat object app dari express
 export const app = express();
 
-// Jalankan server
+//b. Jalankan server
 const PORT = process.env.PORT || 3000;
 
+//c. listen request app pada port >> 3000
 app.listen(PORT, () => {
   console.log(`Server started on port ${PORT}`);
 });
@@ -115,15 +120,44 @@ app.listen(PORT, () => {
 
 ## 3. Basic Testing
 
+Belajar membuat endpoint request dan response
+
+1. Endpoint GET http://localhost:3000/ > Request => Response send String
+
+Response Body Success :
+
+```json
+"Hello World!"
+```
+
+2. Endpoint GET http://localhost:3000/oby > Request => Response json Object
+   Response Body Success :
+
+```json
+
+```
+
+3. Endpoint POST http://localhost:3000/api/pasien > Request+Body => Response json Object
+   Response Body Success :
+
+```json
+
+```
+
+Untuk pertama kita buat :
+
+#### 1. Endpoint GET http://localhost:3000/ > Request => Response send String
+
 - Memisahkan index.js dan application.js ,untuk memudahkan pengetesan dengan unit test
 
 ```
 //src/index.js
 import { app } from "./application.js";
 
-//1. Jalankan server
+//variabel PORT
 const PORT = process.env.PORT || 3000;
 
+//c. Jalankan server liste port >> 3000
 app.listen(PORT, () => {
     console.log(`Server started on port ${PORT}`);
 });
@@ -135,11 +169,13 @@ app.listen(PORT, () => {
 //src/application.js
 import express from "express";
 
+//a. membuat object app dari express
 export const app = express();
 
+//b. jalankan middleware json express
 app.use(express.json());
 
-//2. Contoh Endpoint API
+//1. Contoh Endpoint API
 app.get('/', (req, res) => {
     console.log('Hello World requested');
     res.send('Hello World!');
@@ -149,10 +185,9 @@ app.get('/', (req, res) => {
 - melakukan pengetesan dengan request.rest
 
 ```
-###
+### TEST request GET ke http://localhost:3000/
 GET http://localhost:3000/
 
-###
 ```
 
 - melakukan pengetesan dengan unit test
@@ -161,12 +196,15 @@ GET http://localhost:3000/
 //test/app.test.js
 const request = require('supertest');
 const { app } = require('../src/application');
-//const { app } = require('../src');
 
-describe('GET /', () => {
-  it('should return Hello World', async () => {
+//a. fungsi testing dengan describe >> it
+describe('TEST GET http://localhost:3000/', () => {
+  it('Mendapatkan return Hello World', async () => {
+    //b. lakukan request "/" dan tangkap hasilnya ke variable response
     const response = await request(app).get('/');
+    //c. Jika request berhasil ke server maka status response = 200
     expect(response.status).toBe(200);
+    //d. Periksa isi response seharusnya 'Hello World!'
     expect(response.text).toBe('Hello World!');
   });
 });
@@ -177,30 +215,39 @@ describe('GET /', () => {
 
 4. Basic Routing
 
+### 2. Endpoint GET http://localhost:3000/oby > Request => Response json Object
+
 - end point GET http://localhost:3000/oby
 
 ```
 //src/application.js
 import express from "express";
 
+//a. membuat object app dari express
 export const app = express();
 
+//b. jalankan middleware json express
 app.use(express.json());
 
-//1. Contoh Endpoint API >> GET / >> Response Text
+//1. Contoh Endpoint API
 app.get('/', (req, res) => {
     console.log('Hello World requested');
     res.send('Hello World!');
 });
 
 //2. Contoh Endpoint API >> GET /oby >> Response Object dg router
+//membuat object router dari express
 export const router = express.Router();
+//jalankan middleware router
 app.use(router)
+//data object yang akan di kirim ke respon json
 const dtpasien1 = {
     nama: "Edy",
     alamat: "Semarang"
 }
+//routing untuk http://localhost:3000/oby
 router.get('/oby', (req, res, next) => {
+  // response json data
     res.json({
         message: 'GET Data Pasien Sukses',
         data: dtpasien1
@@ -233,7 +280,7 @@ test("Test GET /oby", async () => {
 })
 ```
 
-## 4. Req Body >> Response Body
+## 5. Req Body >> Response Body
 
 - endpoint POST http://localhost:3000/api/pasien
 
@@ -293,9 +340,19 @@ describe('Test Untuk 1 dan 3', () => {
 ```
 
 ### 5. Membuat EndPoint CRUD Dokumentasi
-dokumentasi pada :  //docs/siswa.md 
+
+Dokumentasi pada file `.\docs\siswa.md` >> CRUD
+
+```
+1. READ : Endpoint : GET /api/siswa
+2. READ : Endpoint : GET /api/siswa/:id
+3. CREATE : Endpoint : POST /api/siswa
+4. DELETE : Endpoint : DELETE /api/siswa/:id
+5. UPDATE : Endpoint : PUT /api/siswa/:id
+```
 
 ### 6. SETTING MYSQL
+
 - Membuat database / Schema dbsiswa
 
 ```
@@ -314,7 +371,9 @@ CREATE TABLE `dbsekolah`.`tbsiswa` (
   `email` VARCHAR(100) NULL,
   `phone` VARCHAR(100) NULL,
   PRIMARY KEY (`id`));
+```
 
+```
 INSERT INTO tbsiswa(first_name,last_name,email,phone)
 VALUES
 ('Silmi','Ayra','silmi@gmail.com','32423423434'),
@@ -364,6 +423,7 @@ export async function query(sql, params) {
 }
 
 ```
+
 - membuat routing siswa
 
 ```
@@ -373,7 +433,7 @@ import { SiswaRouter } from "./siswa.js";
 
 ..........................
 
-//4. Router Siswa
+//4. Jalankan Router Siswa >> middleware router
 router.use("/siswa", SiswaRouter)
 
 app.use("/api", router)
@@ -384,77 +444,99 @@ app.use("/api", router)
 //src/siswa.js
 import express from "express";
 
+//membuat object router siswa dari express
 export const SiswaRouter = express.Router();
 ```
 
 ### 7. TEST ENDPOINT
-- ROUTING
+
+- Endpoint dan perintah query SQL
+
+```
+1. READ : Endpoint : GET /api/siswa
+    SELECT * FROM tabel
+2. READ : Endpoint : GET /api/siswa/:id
+    SELECT * FROM tabel WHERE kolom = ygdicari
+3. CREATE : Endpoint : POST /api/siswa
+    INSERT INTO tabel (kolom) VALUES (?)', [data kirim]
+4. DELETE : Endpoint : DELETE /api/siswa/:id
+    DELETE FROM tabel WHERE kolom = ?', [data]
+5. UPDATE : Endpoint : PUT /api/siswa/:id
+    UPDATE tabel SET kolom=?', [data]
+```
+
+- ROUTING >> request - reponse >> send TEXT STRING
+
 ```
 //src/siswa.js
 import express from "express";
 
 export const SiswaRouter = express.Router();
 
-// 1. Search Siswa API
+// 1. READ : Endpoint : GET /api/siswa
 SiswaRouter.get('/', (req, res, next) => {
     res.send("GET ALL SISWA")
   })
 
-//2. Get Siswa API by ID
+//2. READ : Endpoint : GET /api/siswa/:id
 SiswaRouter.get('/:id', (req, res, next) => {
     res.send("GET SISWA")
   })
 
-//3. Create Siswa API
+//3. CREATE : Endpoint : POST /api/siswa
 SiswaRouter.post('/', (req, res, next) => {
     res.send("ADD NEW SISWA")
   })
 
-//4. Remove Siswa API
+//4. DELETE : Endpoint : DELETE /api/siswa/:id
 SiswaRouter.delete('/:id', (req, res, next) => {
     res.send("DELETE SISWA")
   })
 
-//5. Update Siswa API
+//5. UPDATE : Endpoint : PUT /api/siswa/:id
 SiswaRouter.put('/:id', (req, res, next) => {
     res.send("UPDATE SISWA")
 })
 ```
+
 - .REST
+
 ```
-### 6. GET Data SEARCH ALL (READ) 
+### 6. READ : Endpoint : GET /api/siswa
 GET http://localhost:3000/api/siswa
 
-### 7. GET Data /id (READ) 
+### 7. READ : Endpoint : GET /api/siswa/:id
 GET http://localhost:3000/api/siswa/1
 
-### 8. POST Data (CREATE) 
-POST http://localhost:3000/api/siswa 
+### 8. CREATE : Endpoint : POST /api/siswa
+POST http://localhost:3000/api/siswa
 Content-Type: application/json
 
 {
-"first_name": "Edy", 
-"last_name": "Kholid", 
-"email": "edy@gmail.com", 
+"first_name": "Edy",
+"last_name": "Kholid",
+"email": "edy@gmail.com",
 "phone": "8787878787"
 }
 
-### 9. DELETE Data /id (DELETE) 
+### 9. DELETE : Endpoint : DELETE /api/siswa/:id
 DELETE http://localhost:3000/api/siswa/1
 
-### 10. PUT Data /id (UPDATE) 
-PUT http://localhost:3000/api/siswa/1 
+### 10. UPDATE : Endpoint : PUT /api/siswa/:id
+PUT http://localhost:3000/api/siswa/1
 Content-Type: application/json
 
 {
-"first_name": "Silmi-Rev", 
-"last_name": "Ayra-Rev", 
-"email": "silmi@gmail.com", 
+"first_name": "Silmi-Rev",
+"last_name": "Ayra-Rev",
+"email": "silmi@gmail.com",
 "phone": "32423423434"
 
 }
 ```
+
 - UNIT TEST
+
 ```
 //test/siswa.test.js
 const request = require('supertest');
@@ -463,21 +545,28 @@ const { app } = require('../src/application');
 describe('TEST REST FULL API', () => {
 
     //1. GET http://localhost:3000/api/siswa
-    it('GET Data SEARCH ALL (READ)', async () => {
+    it('READ : Endpoint : GET /api/siswa', async () => {
+        //a.send request get
         const getDataResponse = await request(app).get('/api/siswa');
+        //b. jika sukses, reponse status adalah 200
         expect(getDataResponse.status).toBe(200);
+        //c. jika sukses, reponse berupa text adalah 'GET ALL SISWA'
         expect(getDataResponse.text).toBe('GET ALL SISWA');
     })
 
     //2. GET http://localhost:3000/api/siswa/1
-    it('GET Data by ID (READ)', async () => {
+    it('READ : Endpoint : GET /api/siswa/:id', async () => {
+        //a.send request get
         const getDataResponse = await request(app).get('/api/siswa/1');
+        //b. jika sukses, reponse status adalah 200
         expect(getDataResponse.status).toBe(200);
+        //c. jika sukses, reponse berupa text adalah
         expect(getDataResponse.text).toBe('GET SISWA');
     })
 
     //3. POST http://localhost:3000/api/siswa
-    it('POST Data (CREATE)', async () => {
+    it('CREATE : Endpoint : POST /api/siswa', async () => {
+        //data obyek yang akan dikirim
         const dataKirim = {
             "first_name": "Edy",
             "last_name": "Kholid",
@@ -485,21 +574,29 @@ describe('TEST REST FULL API', () => {
             "phone": "8787878787"
         }
         const getDataResponse = await request(app)
+            //a.send request post
             .post('/api/siswa')
+            //kirim data body >> object dataKirim
             .send(dataKirim);
+            //b. jika sukses, reponse status adalah 200
             expect(getDataResponse.status).toBe(200);
+            //c. jika sukses, reponse berupa text adalah
             expect(getDataResponse.text).toBe('ADD NEW SISWA');
     })
 
     //4. DELETE http://localhost:3000/api/siswa/1
-    it('DELETE Data by Id (DELETE)', async () => {
+    it('DELETE : Endpoint : DELETE /api/siswa/:id', async () => {
+        //a.send request delete
         const getDataResponse = await request(app).delete('/api/siswa/id');
+        //b. jika sukses, reponse status adalah 200
         expect(getDataResponse.status).toBe(200);
+        //c. jika sukses, reponse berupa text adalah
         expect(getDataResponse.text).toBe('DELETE SISWA');
     })
 
     //5. PUT http://localhost:3000/api/siswa/1
-    it('POST Data (CREATE)', async () => {
+    it('UPDATE : Endpoint : PUT /api/siswa/:id', async () => {
+        //data obyek yang akan dikirim
         const dataKirim = {
             "first_name": "Silmi-Rev",
             "last_name": "Ayra-Rev",
@@ -507,24 +604,60 @@ describe('TEST REST FULL API', () => {
             "phone": "32423423434"
           }
         const getDataResponse = await request(app)
+            //a.send request put
             .put('/api/siswa/1')
+            //kirim data body >> object dataKirim
             .send(dataKirim);
+            //b. jika sukses, reponse status adalah 200
             expect(getDataResponse.status).toBe(200);
+            //c. jika sukses, reponse berupa text adalah
             expect(getDataResponse.text).toBe('UPDATE SISWA');
     })
 
 })
 ```
 
-
 ### 8. GET Data ALL (READ)
-- ROUTING
+
+- API SPEC
+  `//docs/siswa.md`
+
+Endpoint : GET /api/siswa
+
+Response Body Success :
+
+```json
+{
+  "data": [
+    {
+      "id": 1,
+      "first_name": "Silmi",
+      "last_name": "Ayra",
+      "email": "silmi@gmail.com",
+      "phone": "32423423434"
+    },
+    {
+      "id": 2,
+      "first_name": "Nafi",
+      "last_name": "Dhafin",
+      "email": "afin@gmail.com",
+      "phone": "112233445566"
+    }
+  ]
+}
 ```
-// 1. Search Siswa API
+
+- ROUTING
+
+```
+// 1. READ : Endpoint : GET /api/siswa
 SiswaRouter.get('/', async (req, res, next) => {
     try {
+        //Perintah Query SQL ke database >> SELECT * FROM tabel
         const rows = await query('SELECT * FROM tbsiswa')
+        //tampilkan di log
         console.log(`GET DATA:${JSON.stringify(rows)}`);
+        //kirim status 200 dan data >> array object rows
         res.status(200).json({'data' : rows})
     } catch (error) {
         console.log(`Error: ${error.message}`);
@@ -532,12 +665,16 @@ SiswaRouter.get('/', async (req, res, next) => {
     }
 })
 ```
+
 - .REST
+
 ```
-### 6. GET Data SEARCH ALL (READ) 
+### 6. READ : Endpoint : GET /api/siswa
 GET http://localhost:3000/api/siswa
 ```
+
 - UNIT TEST
+
 ```
     const dataTest = {
         "id": 1,
@@ -548,7 +685,8 @@ GET http://localhost:3000/api/siswa
     }
 
     //1. GET http://localhost:3000/api/siswa
-    it('GET Data SEARCH ALL (READ)', async () => {
+    it('READ : Endpoint : GET /api/siswa', async () => {
+        // kirim request get dan tangkap responnya
         const getDataResponse = await request(app).get('/api/siswa');
         // Memeriksa panjang array
         expect(getDataResponse.body.data.length).toBeGreaterThan(0);
@@ -556,15 +694,41 @@ GET http://localhost:3000/api/siswa
         expect(getDataResponse.body.data).toEqual(expect.arrayContaining([dataTest]));
     })
 ```
+
 ### 9. GET Data /id (READ)
-- ROUTING
+
+- API SPEC
+  `//docs/siswa.md`
+
+READ : Endpoint : GET /api/siswa/:id
+
+Response Body Success :
+
+```json
+{
+  "data": {
+    "id": 1,
+    "first_name": "Silmi",
+    "last_name": "Ayra",
+    "email": "silmi@gmail.com",
+    "phone": "32423423434"
+  }
+}
 ```
-//2. Get Siswa API by ID
+
+- ROUTING
+
+```
+//2. READ : Endpoint : GET /api/siswa/:id
 SiswaRouter.get('/:id', async (req, res, next) => {
     try {
+        //ambil id dari request params
         const { id } = req.params;
+        //Perintah Query SQL ke database >> SELECT * FROM tabel WHERE kolom = ygdicari
         const rows = await query('SELECT * FROM tbsiswa WHERE id = ?', [id])
+        //tampilkan di log
         console.log(`GET DATA: ${JSON.stringify(rows)}`);
+        //kirim status 200 dan data >> array objec rows >> object rows ke 0
         res.status(200).json({'data' : rows[0]})
     } catch (error) {
         console.log(`Error: ${error.message}`);
@@ -572,34 +736,67 @@ SiswaRouter.get('/:id', async (req, res, next) => {
     }
 })
 ```
+
 - .REST
+
 ```
-### 7. GET Data /id (READ) 
+### 7. READ : Endpoint : GET /api/siswa/:id
 GET http://localhost:3000/api/siswa/1
 ```
+
 - UNIT TEST
+
 ```
     //2. GET http://localhost:3000/api/siswa/1
-    it('GET Data by ID (READ)', async () => {
+    it('READ : Endpoint : GET /api/siswa/:id', async () => {
+        // kirim request get dan tangkap responnya
         const getDataResponse = await request(app).get('/api/siswa/1');
+        //Periksa respon status adalah 200
         expect(getDataResponse.status).toBe(200);
-        // Memeriksa isi object
+        // Memeriksa isi object response = data test
         expect(getDataResponse.body.data).toEqual(dataTest);
     })
 ```
+
 ### 10. POST Data (CREATE)
-- ROUTING
+
+- API SPEC
+  `//docs/siswa.md`
+
+CREATE : Endpoint : POST /api/siswa
+
+Response Body Success :
+
+```json
+{
+  "data": {
+    "id": 3,
+    "first_name": "Edy",
+    "last_name": "Kholid",
+    "email": "edy@gmail.com",
+    "phone": "8787878787"
+  }
+}
 ```
-//3. Create Siswa API
+
+- ROUTING
+
+```
+//3. CREATE : Endpoint : POST /api/siswa
 SiswaRouter.post('/', async (req, res, next) => {
     try {
-        // Data valid, lanjutkan proses
+        //ambil data yg akan disimpan dari request body
         const { first_name, last_name, email, phone } = req.body;
+        //kirim query SQL perintah simpan >> INSERT INTO tabel (kolom) VALUES (?)', [data kirim]
         const results = await query('INSERT INTO tbsiswa (first_name,last_name,email,phone) VALUES (?, ?, ?,?)', [first_name, last_name, email, phone]);
+        //ambil data hasil query berupa ID insert
         const id = results.insertId
         //console.log(results.insertId);
+        //GET data ke server dengan id hasil insert >> SELECT * FROM tabel WHERE kolom = ?', [data]
         const rows = await query('SELECT * FROM tbsiswa WHERE id = ?', [id]);
+        //tampilkan hasilnya di log
         console.log(`POST NEW DATA: ${JSON.stringify(rows)}`);
+        //kirim status 201, dan data array object hasil get >> object ke 0 di array
         res.status(201).send({ 'data': rows[0] });
     } catch (error) {
         console.log(`Error: ${error.message}`);
@@ -607,23 +804,27 @@ SiswaRouter.post('/', async (req, res, next) => {
     }
 })
 ```
+
 - .REST
+
 ```
-### 8. POST Data (CREATE)
-POST http://localhost:3000/api/siswa 
+### 8. CREATE : Endpoint : POST /api/siswa
+POST http://localhost:3000/api/siswa
 Content-Type: application/json
 
 {
-"first_name": "Edy", 
-"last_name": "Kholid", 
-"email": "edy@gmail.com", 
+"first_name": "Edy",
+"last_name": "Kholid",
+"email": "edy@gmail.com",
 "phone": "8787878787"
 }
 ```
+
 - UNIT TEST
+
 ```
     //3. POST http://localhost:3000/api/siswa
-    it.skip('POST Data (CREATE)', async () => {
+    it.skip('CREATE : Endpoint : POST /api/siswa', async () => {
         const dataKirim = {
             "first_name": "Edy",
             "last_name": "Kholid",
@@ -631,8 +832,11 @@ Content-Type: application/json
             "phone": "8787878787"
         }
         const getDataResponse = await request(app)
+            //kirim request post
             .post('/api/siswa')
+            //kirim data ke dalam request body
             .send(dataKirim);
+        //Jika sukses, respon tatus adalah 201
         expect(getDataResponse.status).toBe(201);
         // Memeriksa bahwa respons adalah sebuah objek
         expect(getDataResponse.body.data).toBeInstanceOf(Object);
@@ -640,23 +844,41 @@ Content-Type: application/json
         expect(getDataResponse.body.data).toEqual(expect.objectContaining({ "first_name": "Edy" }));
     })
 ```
+
 ### 11. DELETE Data /id (DELETE)
-- ROUTING
+
+- API SPEC
+  `//docs/siswa.md`
+
+DELETE : Endpoint : DELETE /api/siswa/:id
+DELETE http://localhost:3000/api/siswa/2
+
+Response Body Success :
+
 ```
-//4. Remove Siswa API
+Deleted Successfully
+```
+
+- ROUTING
+
+```
+//4. DELETE : Endpoint : DELETE /api/siswa/:id
 SiswaRouter.delete('/:id', async (req, res, next) => {
     try {
-
+        //ambil data id dari request poarams
         const { id } = req.params;
-        //check data jika ada
 
-        //delete data
+        //kirim query SQL delete >> DELETE FROM tabel WHERE kolom = ?', [data]
         const result = await query('DELETE FROM tbsiswa WHERE id = ?', [id]);
+        //buat variable message
         let message = 'Error in delete';
+        //jika ada datanya maka pesan sukses delete
         if (result.affectedRows) {
             message = 'Deleted Successfully';
         }
+        //tampilkan data id
         console.log(`DELETE DATA: ${id}`);
+        //kirim response status 200 dan message (sukses / gagal delete)
         return res.status(200).send(message);
     } catch (error) {
         console.log(`Error: ${error.message}`);
@@ -664,41 +886,82 @@ SiswaRouter.delete('/:id', async (req, res, next) => {
     }
 })
 ```
+
 - .REST
+
 ```
-### 9. DELETE Data /id (DELETE) 
-DELETE http://localhost:3000/api/siswa/14
+### 9. DELETE : Endpoint : DELETE /api/siswa/:id
+DELETE http://localhost:3000/api/siswa/2
 ```
+
 - UNIT TEST
+
 ```
     //4. DELETE http://localhost:3000/api/siswa/1
-    it.skip('DELETE Data by Id (DELETE)', async () => {
+    it.skip('DELETE : Endpoint : DELETE /api/siswa/:id', async () => {
+        // test >> 1.insert data >> 2.ambil id insert >> 3.hapus data dg id insert
 
-        //insert data >> dapatkan ID
+        //1. insert data >> dapatkan ID
+        //data insert
         const dataInsert = ["test", "test", "test@gmail.com", "080900000"]
+        //kirimkan query SQL insert >> INSERT INTO tabel (kolom) VALUES (?) [data]
         const results = await query('INSERT INTO tbsiswa (first_name,last_name,email,phone) VALUES (?, ?, ?,?)', dataInsert);
+
+        //2. simpan data id insert
         const idData = results.insertId
-        //gunakan ID untuk request delete by ID
-        const getDataResponse = await request(app).delete(`/api/siswa/${idData}`);
+
+        //3. gunakan ID untuk request delete by ID
+            //kirim request delete
+        const getDataResponse = await request(app)
+        .delete(`/api/siswa/${idData}`);
+        //pastikan hasil reponse status adalah 200
         expect(getDataResponse.status).toBe(200);
+        //pastikan response test adalah Deleted Successfully
         expect(getDataResponse.text).toBe('Deleted Successfully');
     })
 ```
+
 ### 12. PUT Data /id (UPDATE)
-- ROUTING
+
+- API SPEC
+  `//docs/siswa.md`
+
+UPDATE : Endpoint : PUT /api/siswa/:id
+
+Response Body Success :
+
+```json
+{
+  "data": {
+    "id": 1,
+    "first_name": "Silmi-Rev",
+    "last_name": "Ayra-Rev",
+    "email": "silmi@gmail.com",
+    "phone": "32423423434"
+  }
+}
 ```
-//5. Update Siswa API
+
+- ROUTING
+
+```
+//UPDATE : Endpoint : PUT /api/siswa/:id
 SiswaRouter.put('/:id',async  (req, res, next) => {
     console.log(req.params,req.body);
     try {
+        //mengambil id dari request params
         const { id } = req.params
-
+        //mengambil data dari request body
         const { first_name, last_name, email, phone } = req.body;
+        //mengirim perintah quesrySQL Update >> UPDATE tabel SET kolom=?', [data]
         await query('UPDATE tbsiswa SET first_name=?, last_name=? ,email=? ,phone=? WHERE id=?', [first_name, last_name, email, phone,id]);
-        
+
+        //Get data setelah di lakukan update
+        //mengirim perintah quesrySQL SELECT >> SELECT * FROM tabel WHERE kolom = ?', [id]
         const rows = await query('SELECT * FROM tbsiswa WHERE id = ?', [id]);
+        //tampilkan dalam log hasilnya
         console.log(`POST NEW DATA: ${JSON.stringify(rows)}`);
-        
+        //kirim reaponse status 200 dan data array object >> object dalam array ke 0
         res.status(201).send({ 'data': rows[0] });
     } catch (error) {
         console.log(`Error: ${error.message}`);
@@ -707,50 +970,65 @@ SiswaRouter.put('/:id',async  (req, res, next) => {
 
 })
 ```
+
 - .REST
+
 ```
-### 10. PUT Data /id (UPDATE)
-PUT http://localhost:3000/api/siswa/1 
+### 10. UPDATE : Endpoint : PUT /api/siswa/:id
+PUT http://localhost:3000/api/siswa/1
 Content-Type: application/json
 
 {
-"first_name": "Silmi-Rev", 
-"last_name": "Ayra-Rev", 
-"email": "silmi@gmail.com", 
+"first_name": "Silmi-Rev",
+"last_name": "Ayra-Rev",
+"email": "silmi@gmail.com",
 "phone": "32423423434"
 
 }
 ```
-- UNIT TEST
-```
-describe('PUT /api/siswa/:id', function () {
 
+- UNIT TEST
+
+```
+describe('UPDATE : Endpoint : PUT /api/siswa/:id', function () {
+
+    //Cara TEST >> 1. Insert data baru >> 2. Update Data >> 3. Delete data
+
+    //1. insert data baru sebelum test >> simpan ID >> beforeEach (sebelum test)
     let idData
-    //insert data baru sebelum test >> simpan ID
     beforeEach(async () => {
         const dataInsert = ["Silmi", "Ayra", "test@gmail.com", "32423423434"]
         const results = await query('INSERT INTO tbsiswa (first_name,last_name,email,phone) VALUES (?, ?, ?,?)', dataInsert);
         idData = results.insertId
     })
-    // hapus data setelah test >> detele by ID
+
+    //3. hapus data setelah test >> detele by ID >> afterEach (setelah test)
     afterEach(async () => {
         await query('DELETE FROM tbsiswa WHERE id = ?', [idData]);
     })
 
-    //5. PUT http://localhost:3000/api/siswa/1
-    it('PUT Data (UPDATE)', async () => {
+    //2. PUT http://localhost:3000/api/siswa/1
+    it('UPDATE : Endpoint : PUT /api/siswa/:id', async () => {
+        //data yang akan dikirim update
         const dataKirim = {
             "first_name": "Silmi-Rev",
             "last_name": "Ayra-Rev",
             "email": "silmi@gmail.com",
             "phone": "32423423434"
         }
+
         const getDataResponse = await request(app)
+            //kirim request put
             .put(`/api/siswa/${idData}`)
+            //kirim data yang akan di update ke dalam request body
             .send(dataKirim);
+        //perisa response status adalah 201
         expect(getDataResponse.status).toBe(201);
+        //periksa isi response body data id adalah idData
         expect(getDataResponse.body.data.id).toBe(idData);
+        //periksa isi response body data first_name adalah Silmi-Rev
         expect(getDataResponse.body.data.first_name).toBe("Silmi-Rev");
+        //periksa isi response body data last_name adalah Ayra-Rev
         expect(getDataResponse.body.data.last_name).toBe("Ayra-Rev");
         expect(getDataResponse.body.data.email).toBe("silmi@gmail.com");
         expect(getDataResponse.body.data.phone).toBe("32423423434");

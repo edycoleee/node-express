@@ -31,7 +31,7 @@ Content-Type: application/json
 }
 
 ### 9. DELETE Data /id (DELETE) 
-DELETE http://localhost:3000/api/siswa/14
+DELETE http://localhost:3000/api/siswa/2
 
 ### 10. PUT Data /id (UPDATE)
 PUT http://localhost:3000/api/siswa/1 
