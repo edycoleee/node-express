@@ -185,6 +185,7 @@ app.get('/', (req, res) => {
 - melakukan pengetesan dengan request.rest
 
 ```
+//request.rest
 ### TEST request GET ke http://localhost:3000/
 GET http://localhost:3000/
 
