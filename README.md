@@ -1924,6 +1924,11 @@ describe('TEST UPDTAE by id', () => {
     console.log(idTest);
   })
 
+  //Delete data
+  afterEach(async () => {
+    await deleteAllTestSiswa();
+  })
+
   //5. PUT http://localhost:3000/api/siswa/1
   it('UPDATE : Endpoint : PUT /api/siswa/:id', async () => {
     //data obyek yang akan dikirim

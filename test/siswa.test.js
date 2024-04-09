@@ -144,6 +144,7 @@ describe('TEST DELETE by id', () => {
     console.log(idTest);
   })
 
+
   //4. DELETE http://localhost:3000/api/siswa/1
   it('DELETE : Endpoint : DELETE /api/siswa/:id', async () => {
     //a.send request delete
@@ -189,6 +190,11 @@ describe('TEST UPDTAE by id', () => {
     //gunakan id untuk test get by id
     idTest = rows[0].id
     console.log(idTest);
+  })
+
+  //Delete data
+  afterEach(async () => {
+    await deleteAllTestSiswa();
   })
 
   //5. PUT http://localhost:3000/api/siswa/1
