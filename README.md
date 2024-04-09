@@ -135,14 +135,26 @@ Response Body Success :
    Response Body Success :
 
 ```json
-
+{
+  "message": "GET Data Pasien Sukses",
+  "data": {
+    "nama": "Edy",
+    "alamat": "Semarang"
+  }
+}
 ```
 
 3. Endpoint POST http://localhost:3000/api/pasien > Request+Body => Response json Object
    Response Body Success :
 
 ```json
-
+{
+  "message": "POST Data Pasien Sukses",
+  "data": {
+    "nama": "Silmi",
+    "alamat": "Karangawen"
+  }
+}
 ```
 
 Untuk pertama kita buat :
@@ -837,6 +849,7 @@ Content-Type: application/json
 
 - Unit Test >>pisahkan masing2 menjadi satu siklus tes
 
+```
 1. READ : Endpoint : GET /api/siswa
    a.Insert data(10), b.Test GET ALL, c.Test Validasi, d.Delete data
 2. READ : Endpoint : GET /api/siswa/:id
@@ -848,6 +861,7 @@ Content-Type: application/json
 5. UPDATE : Endpoint : PUT /api/siswa/:id
    a.Insert data(1), b.Test PUT id, c.Test Validasi, d.Delete data
 6. Setelah dikumpulkan fungsi test >> util-test.js
+```
 
 ```
 //test/util-test.js
