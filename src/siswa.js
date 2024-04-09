@@ -19,11 +19,11 @@ SiswaRouter.get('/:id', (req, res, next) => {
   //Validasi data id >> req.params.id
   const { error } = getSiswaValidation.validate(req.params.id);
   if (error) {
-    console.log(`Validation Error: ${error.message}`);
+    //console.log(`Validation Error: ${error.message}`);
     return res
       .status(400)
       .json({
-        error: error.details[0].message
+        errors: error.details[0].message
       })
   }
 
@@ -39,7 +39,11 @@ SiswaRouter.post('/', (req, res, next) => {
   const { error } = createSiswaValidation.validate(req.body);
   if (error) {
     console.log(`Validation Error: ${error.message}`);
-    return res.status(400).send(error.details[0].message);
+    return res
+      .status(400)
+      .json({
+        errors: error.details[0].message
+      })
   }
 
   //INSERT INTO tabel (kolom) VALUES (?)', [data kirim]
@@ -54,7 +58,11 @@ SiswaRouter.delete('/:id', (req, res, next) => {
   const { error } = delsiswaValidation.validate(req.params.id);
   if (error) {
     console.log(`Validation Error: ${error.message}`);
-    return res.status(400).send(error.details[0].message);
+    return res
+      .status(400)
+      .json({
+        errors: error.details[0].message
+      })
   }
 
   //DELETE FROM tabel WHERE kolom = ?', [data]
@@ -76,7 +84,11 @@ SiswaRouter.put('/:id', (req, res, next) => {
   const { error } = updateSiswaValidation.validate(dataIn);
   if (error) {
     console.log(`Validation Error: ${error.message}`);
-    return res.status(400).send(error.details[0].message);
+    return res
+      .status(400)
+      .json({
+        errors: error.details[0].message
+      })
   }
 
   //UPDATE tabel SET kolom=?', [data]
