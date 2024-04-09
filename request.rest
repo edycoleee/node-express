@@ -16,12 +16,16 @@ Content-Type: application/json
 ### 6. READ : Endpoint : GET /api/siswa
 GET http://localhost:3000/api/siswa
 
-### 7. READ : Endpoint : GET /api/siswa/:id 
+### 7. READ : Endpoint : GET /api/siswa/:id
 GET http://localhost:3000/api/siswa/1
 
 ### 7a. Validation READ : Endpoint : GET /api/siswa/:id 
 //"value" must be a number
 GET http://localhost:3000/api/siswa/a
+
+### 7b. Validation READ : Endpoint : GET /api/siswa/:id
+//error not found
+GET http://localhost:3000/api/siswa/1000
 
 ### 8. CREATE : Endpoint : POST /api/siswa
 POST http://localhost:3000/api/siswa
@@ -52,8 +56,12 @@ DELETE http://localhost:3000/api/siswa/1
 //"value" must be a number
 DELETE http://localhost:3000/api/siswa/a
 
+### 9b. Validation DELETE : Endpoint : DELETE /api/siswa/:id
+//"errors": "Siswa is not found"
+DELETE http://localhost:3000/api/siswa/1000
+
 ### 10. UPDATE : Endpoint : PUT /api/siswa/:id
-PUT http://localhost:3000/api/siswa/1
+PUT http://localhost:3000/api/siswa/66
 Content-Type: application/json
 
 {
@@ -82,6 +90,18 @@ Content-Type: application/json
 
 {
 "first_name": "",
+"last_name": "Ayra-Rev",
+"email": "silmi@gmail.com",
+"phone": "32423423434"
+}
+
+### 10c. Validation UPDATE : Endpoint : PUT /api/siswa/:id
+//"errors": "Siswa is not found"
+PUT http://localhost:3000/api/siswa/1000
+Content-Type: application/json
+
+{
+"first_name": "Silmi-Rev",
 "last_name": "Ayra-Rev",
 "email": "silmi@gmail.com",
 "phone": "32423423434"
