@@ -20,7 +20,11 @@ SiswaRouter.get('/:id', (req, res, next) => {
   const { error } = getSiswaValidation.validate(req.params.id);
   if (error) {
     console.log(`Validation Error: ${error.message}`);
-    return res.status(400).send(error.details[0].message);
+    return res
+      .status(400)
+      .json({
+        error: error.details[0].message
+      })
   }
 
   //SELECT * FROM tabel WHERE kolom = ygdicari

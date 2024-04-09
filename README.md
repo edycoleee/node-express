@@ -605,7 +605,7 @@ describe('TEST REST FULL API', () => {
     //4. DELETE http://localhost:3000/api/siswa/1
     it('DELETE : Endpoint : DELETE /api/siswa/:id', async () => {
         //a.send request delete
-        const getDataResponse = await request(app).delete('/api/siswa/id');
+        const getDataResponse = await request(app).delete('/api/siswa/1');
         //b. jika sukses, reponse status adalah 200
         expect(getDataResponse.status).toBe(200);
         //c. jika sukses, reponse berupa text adalah
