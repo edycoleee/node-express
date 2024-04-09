@@ -12,3 +12,77 @@ Content-Type: application/json
   "nama" : "Silmi",
   "alamat": "Karangawen"
 }
+
+### 6. READ : Endpoint : GET /api/siswa
+GET http://localhost:3000/api/siswa
+
+### 7. READ : Endpoint : GET /api/siswa/:id 
+GET http://localhost:3000/api/siswa/1
+
+### 7a. Validation READ : Endpoint : GET /api/siswa/:id 
+//"value" must be a number
+GET http://localhost:3000/api/siswa/a
+
+### 8. CREATE : Endpoint : POST /api/siswa
+POST http://localhost:3000/api/siswa
+Content-Type: application/json
+
+{
+"first_name": "Edy",
+"last_name": "Kholid",
+"email": "edy@gmail.com",
+"phone": "8787878787"
+}
+
+### 8a. Validation CREATE : Endpoint : POST /api/siswa
+//"first_name" is not allowed to be empty
+POST http://localhost:3000/api/siswa
+Content-Type: application/json
+
+{
+"first_name": "",
+"last_name": "Kholid",
+"phone": "8787878787"
+}
+
+### 9. DELETE : Endpoint : DELETE /api/siswa/:id
+DELETE http://localhost:3000/api/siswa/1
+
+### 9a. Vvalidation DELETE : Endpoint : DELETE /api/siswa/:id
+//"value" must be a number
+DELETE http://localhost:3000/api/siswa/a
+
+### 10. UPDATE : Endpoint : PUT /api/siswa/:id
+PUT http://localhost:3000/api/siswa/1
+Content-Type: application/json
+
+{
+"first_name": "Silmi-Rev",
+"last_name": "Ayra-Rev",
+"email": "silmi@gmail.com",
+"phone": "32423423434"
+}
+
+### 10a. Validation UPDATE : Endpoint : PUT /api/siswa/:id
+//"id" must be a number
+PUT http://localhost:3000/api/siswa/a
+Content-Type: application/json
+
+{
+"first_name": "Silmi-Rev",
+"last_name": "Ayra-Rev",
+"email": "silmi@gmail.com",
+"phone": "32423423434"
+}
+
+### 10b. Validation UPDATE : Endpoint : PUT /api/siswa/:id
+//"first_name" is not allowed to be empty
+PUT http://localhost:3000/api/siswa/1
+Content-Type: application/json
+
+{
+"first_name": "",
+"last_name": "Ayra-Rev",
+"email": "silmi@gmail.com",
+"phone": "32423423434"
+}

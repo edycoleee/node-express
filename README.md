@@ -352,8 +352,6 @@ Dokumentasi pada file `.\docs\siswa.md` >> CRUD
 5. UPDATE : Endpoint : PUT /api/siswa/:id
 ```
 
-### 6. Setting MYSQL
-
 ### 6. SETTING MYSQL
 
 - Membuat database / Schema dbsiswa
@@ -389,7 +387,7 @@ VALUES
 DB_HOST=localhost
 DB_USERNAME=root
 DB_PASSWORD=760410
-DB_NAME=dbsiswa
+DB_NAME=dbsekolah
 DB_PORT=3306
 ```
 
@@ -406,7 +404,7 @@ export const config = {
     host: "localhost",
     user: "root",
     password: "760410",
-    database: "dbsiswa",
+    database: "dbsekolah",
     connectTimeout: 60000
   },
 };
@@ -625,21 +623,272 @@ describe('TEST REST FULL API', () => {
 })
 ```
 
+- jalankan test dengan `npx jest siswa.test.js`
+
 ### 8. Membuat Joi Validasi
 
 - Joi Validasi
 
 ```
+//src/siswa-validation.js
+import Joi from "joi";
+
+//1. READ : Endpoint : GET /api/siswa
+
+//2. READ : Endpoint : GET /api/siswa/:id
+//validasi apakah id > angka, positive, required(wajib ada)
+export const getSiswaValidation = Joi.number().positive().required();
+
+//3. CREATE : Endpoint : POST /api/siswa
+//validasi Create
+export const createSiswaValidation = Joi.object({
+    //string, max100, required
+    first_name: Joi.string().max(100).required(),
+    //string, max100, opsional(boleh tdk ada)
+    last_name: Joi.string().max(100).optional(),
+    //email, max200, opsional
+    email: Joi.string().max(200).email().optional(),
+    //string, max20, opsional
+    phone: Joi.string().max(20).optional()
+});
+
+//4. DELETE : Endpoint : DELETE /api/siswa/:id
+//validasi id = validasi get by id
+export const delsiswaValidation = getSiswaValidation
+
+//5. UPDATE : Endpoint : PUT /api/siswa/:id
+export const updateSiswaValidation = Joi.object({
+    //validasi id > angka, positive, required(wajib ada)
+    id: Joi.number().positive().required(),
+    //string, max100, required
+    first_name: Joi.string().max(100).required(),
+    //string, max100, opsional(boleh tdk ada)
+    last_name: Joi.string().max(100).optional(),
+    email: Joi.string().max(200).email().optional(),
+    phone: Joi.string().max(20).optional()
+});
+
+```
+
+### 9. Implementasi Joi
+
+- Routing
+
+```
+//src/siswa.js
+import express from "express";
+import { createSiswaValidation, delsiswaValidation, getSiswaValidation, updateSiswaValidation } from "./siswa-validation.js";
+
+export const SiswaRouter = express.Router();
+
+// 1. READ : Endpoint : GET /api/siswa
+SiswaRouter.get('/', (req, res, next) => {
+
+  //Validasi data
+
+  //SELECT \* FROM tabel
+  res.send("GET ALL SISWA")
+})
+
+//2. READ : Endpoint : GET /api/siswa/:id
+SiswaRouter.get('/:id', (req, res, next) => {
+
+  //Validasi data id >> req.params.id
+  const { error } = getSiswaValidation.validate(req.params.id);
+  if (error) {
+    console.log(`Validation Error: ${error.message}`);
+    return res.status(400).send(error.details[0].message);
+  }
+
+  //SELECT * FROM tabel WHERE kolom = ygdicari
+  res.send("GET SISWA")
+
+})
+
+//3. CREATE : Endpoint : POST /api/siswa
+SiswaRouter.post('/', (req, res, next) => {
+
+  // Validasi data req.body
+  const { error } = createSiswaValidation.validate(req.body);
+  if (error) {
+    console.log(`Validation Error: ${error.message}`);
+    return res.status(400).send(error.details[0].message);
+  }
+
+  //INSERT INTO tabel (kolom) VALUES (?)', [data kirim]
+  res.send("ADD NEW SISWA")
+
+})
+
+//4. DELETE : Endpoint : DELETE /api/siswa/:id
+SiswaRouter.delete('/:id', (req, res, next) => {
+
+  //Validasi data id >> req.params.id
+  const { error } = delsiswaValidation.validate(req.params.id);
+  if (error) {
+    console.log(`Validation Error: ${error.message}`);
+    return res.status(400).send(error.details[0].message);
+  }
+
+  //DELETE FROM tabel WHERE kolom = ?', [data]
+  res.send("DELETE SISWA")
+
+})
+
+//5. UPDATE : Endpoint : PUT /api/siswa/:id
+SiswaRouter.put('/:id', (req, res, next) => {
+
+  // Validasi data req.body dan req params.id
+  const dataIn = {
+    "id": req.params.id,
+    "first_name": req.body.first_name,
+    "last_name": req.body.last_name,
+    "email": req.body.email,
+    "phone": req.body.phone
+  }
+  const { error } = updateSiswaValidation.validate(dataIn);
+  if (error) {
+    console.log(`Validation Error: ${error.message}`);
+    return res.status(400).send(error.details[0].message);
+  }
+
+  //UPDATE tabel SET kolom=?', [data]
+  res.send("UPDATE SISWA")
+})
+```
+
+- .REST Test
+
+```
+### 6. READ : Endpoint : GET /api/siswa
+GET http://localhost:3000/api/siswa
+
+### 7. READ : Endpoint : GET /api/siswa/:id
+GET http://localhost:3000/api/siswa/1
+
+### 7a. Validation READ : Endpoint : GET /api/siswa/:id
+//"value" must be a number
+GET http://localhost:3000/api/siswa/a
+
+### 8. CREATE : Endpoint : POST /api/siswa
+POST http://localhost:3000/api/siswa
+Content-Type: application/json
+
+{
+"first_name": "Edy",
+"last_name": "Kholid",
+"email": "edy@gmail.com",
+"phone": "8787878787"
+}
+
+### 8a. Validation CREATE : Endpoint : POST /api/siswa
+//"first_name" is not allowed to be empty
+POST http://localhost:3000/api/siswa
+Content-Type: application/json
+
+{
+"first_name": "",
+"last_name": "Kholid",
+"phone": "8787878787"
+}
+
+### 9. DELETE : Endpoint : DELETE /api/siswa/:id
+DELETE http://localhost:3000/api/siswa/1
+
+### 9a. Vvalidation DELETE : Endpoint : DELETE /api/siswa/:id
+//"value" must be a number
+DELETE http://localhost:3000/api/siswa/a
+
+### 10. UPDATE : Endpoint : PUT /api/siswa/:id
+PUT http://localhost:3000/api/siswa/1
+Content-Type: application/json
+
+{
+"first_name": "Silmi-Rev",
+"last_name": "Ayra-Rev",
+"email": "silmi@gmail.com",
+"phone": "32423423434"
+}
+
+### 10a. Validation UPDATE : Endpoint : PUT /api/siswa/:id
+//"id" must be a number
+PUT http://localhost:3000/api/siswa/a
+Content-Type: application/json
+
+{
+"first_name": "Silmi-Rev",
+"last_name": "Ayra-Rev",
+"email": "silmi@gmail.com",
+"phone": "32423423434"
+}
+
+### 10b. Validation UPDATE : Endpoint : PUT /api/siswa/:id
+//"first_name" is not allowed to be empty
+PUT http://localhost:3000/api/siswa/1
+Content-Type: application/json
+
+{
+"first_name": "",
+"last_name": "Ayra-Rev",
+"email": "silmi@gmail.com",
+"phone": "32423423434"
+}
+```
+
+- Unit Test >>pisahkan masing2 menjadi satu siklus tes
+
 1. READ : Endpoint : GET /api/siswa
-
+   a.Insert data(10), b.Test GET ALL, c.Test Validasi, d.Delete data
 2. READ : Endpoint : GET /api/siswa/:id
-
+   a.Insert data(1), b.Test GET id, c.Test Validasi, d.Delete data
 3. CREATE : Endpoint : POST /api/siswa
-
+   a.Test Insert, c.Test Validasi, d.Delete data
 4. DELETE : Endpoint : DELETE /api/siswa/:id
-
+   a.Insert data(1), b.Test Delete id, c.Test Validasi d.Delete data
 5. UPDATE : Endpoint : PUT /api/siswa/:id
+   a.Insert data(1), b.Test PUT id, c.Test Validasi, d.Delete data
+6. Setelah dikumpulkan fungsi test >> util-test.js
 
+```
+//test/util-test.js
+
+//a. Insert data 10
+export const insertManyTestSiswa = async () => {
+  let data = {}
+  for (let i = 0; i < 10; i++) {
+    data = {
+      first_name: `test ${i}`,
+      last_name: `test ${i}`,
+      email: `test${i}@gmail.com`,
+      phone: `080900000${i}`
+    }
+    console.log(`Insert {i} data`)
+  }
+}
+
+//b. Insert data 1
+export const insertTestSiswa = async () => {
+  data = {
+    first_name: `test-Insert`,
+    last_name: `test-Insert`,
+    email: `testinsert@gmail.com`,
+    phone: `08090000000`
+  }
+  console.log(`Insert 1 data`)
+}
+
+//c. Delete data
+export const deleteAllTestSiswa = async () => {
+  console.log(`Delete data`)
+}
+```
+
+```
+//1. READ : Endpoint : GET /api/siswa
+//2. READ : Endpoint : GET /api/siswa/:id
+//3. CREATE : Endpoint : POST /api/siswa
+//4. DELETE : Endpoint : DELETE /api/siswa/:id
+//5. UPDATE : Endpoint : PUT /api/siswa/:id
 ```
 
 ### 9. GET Data ALL (READ)
