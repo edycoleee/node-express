@@ -1,4 +1,4 @@
-## BELAJAR NODE JS EXPRESS
+## BELAJAR NODE JS EXPRESS => PAGING
 
 ## 1. PERSIAPAN
 
@@ -294,11 +294,644 @@ describe('Test Untuk 1 dan 3', () => {
 
 ### 5. Membuat EndPoint GET dengan paging
 
+1. Endpoint : GET /api/siswa?page=1&size=10
+    `SELECT * FROM table_name LIMIT ${limit} OFFSET ${offset}`
+2. Endpoint : GET /api/siswa/search?page=1&size=10&first_name=edy
+    `SELECT * FROM table_name WHERE 1=1 AND column_name1 LIKE '%${searchTerm1}%' LIMIT ${limit} OFFSET ${offset}`
+
 ### 6. Konfigurasi Mysql
+`npm install mysql2`
+```
+  db: {
+    /* don't expose password or any sensitive info, done only for demo */
+    host: "147.139.169.55",
+    user: "root",
+    password: "super-password1",
+    database: "dbsekolah",
+    connectTimeout: 60000
+  },
+```
+```
+//src/util/db.js
+import mysql from "mysql2/promise";
+import { config } from "./config.js";
 
-### 7. Test Koneksi Mysql
 
+export async function query(sql, params) {
+  const connection = await mysql.createConnection(config.db);
+  const [results,] = await connection.execute(sql, params);
+  await connection.end();
+  return results;
+}
+```
+
+### 7. Routing Endpoint
+```
+//src/application.js
+export const app = express();
+
+..................
+
+//4. Jalankan Router Siswa >> middleware router
+router.use("/siswa", SiswaRouter)
+
+app.use("/api", router)
+```
+
+1. GET Tanpa Limit >> GET http://localhost:3000/api/siswa
+
+Response :
+```json
+{
+  "data": [
+    {
+      "page": 1,
+      "size": 10,
+      "offset": 0
+    }
+  ]
+}
+```
+- Routing
+```
+//src/siswa.js
+import express from "express";
+import { query } from "./util/db.js";
+
+export const SiswaRouter = express.Router();
+
+//1. GET : Endpoint : GET /api/siswa
+SiswaRouter.get("/", async (req, res, next) => {
+  console.log('Request URL:', req.url);
+  const page = parseInt(req.query.page) || 1;
+  const size = parseInt(req.query.size) || 10;
+  const offset = (page - 1) * size;
+
+  res.status(200).json({ data: [{ page, size, offset }] });
+});
+```
+- Unit Test
+```
+import supertest from "supertest";
+import { app } from "../application.js";
+
+describe("GET /api/siswa", () => {
+  it("should respond with paging", async () => {
+    const response = await supertest(app)
+      .get("/api/siswa")
+      .expect("Content-Type", /json/)
+      .expect(200);
+    console.log("BODY :", response.body.data);
+    // Memeriksa apakah respons adalah array
+    expect(Array.isArray(response.body.data)).toBeTruthy();
+
+    // Memeriksa apakah panjang respons tidak melebihi batas yang ditentukan
+    expect(response.body.data.length).toBeGreaterThan(0);
+  });
+});
+```
+
+2. GET Dengan Limit >> GET http://localhost:3000/api/siswa?page=2&size=5
+
+Response :
+```json
+{
+  "data": [
+    {
+      "page": 2,
+      "size": 5,
+      "offset": 5
+    }
+  ]
+}
+```
+- Routing >> sama seperti no 1
+- Unit Test
+```
+describe("GET /api/siswa?page=2&size=5", () => {
+  it("should respond with paging", async () => {
+    const response = await supertest(app)
+      .get("/api/siswa?page=2&size=5")
+      .expect("Content-Type", /json/)
+      .expect(200);
+    console.log("BODY :", response.body.data);
+    // Memeriksa apakah respons adalah array
+    expect(Array.isArray(response.body.data)).toBeTruthy();
+
+    // Memeriksa apakah panjang respons tidak melebihi batas yang ditentukan
+    expect(response.body.data.length).toBeGreaterThan(0);
+  });
+});
+```
+3. GET Dengan Limit dan Syarat >> GET http://localhost:3000/api/siswa/search?page=1&limit=10&searchTerm1=test1&searchTerm2=test2&searchTerm3=test3
+
+
+Response :
+```json
+{
+  "data": [
+    {
+      "page": 1,
+      "size": 10,
+      "offset": 0,
+      "searchTerm1": "test1",
+      "searchTerm2": "test2",
+      "searchTerm3": "test3"
+    }
+  ]
+}
+```
+- Routing
+```
+//2. GET : Endpoint : GET /api/siswa/search
+SiswaRouter.get("/search", async (req, res, next) => {
+    const page = parseInt(req.query.page) || 1;
+    const size = parseInt(req.query.size) || 10;
+    const offset = (page - 1) * size;
+    const searchTerm1 = req.query.searchTerm1;
+    const searchTerm2 = req.query.searchTerm2;
+    const searchTerm3 = req.query.searchTerm3;
+
+  res.status(200).json({ data: [{ page, size, offset,searchTerm1,searchTerm2,searchTerm3 }] });
+});
+```
+
+- Unit Test
+```
+describe("GET /api/siswa?page=1&size=10", function () {
+  it("responds with data with paging and search terms", async function () {
+    const response = await supertest(app)
+      .get(
+        "/api/siswa/search?page=1&limit=10&searchTerm1=test1&searchTerm2=test2&searchTerm3=test3"
+      )
+      .expect("Content-Type", /json/)
+      .expect(200);
+    console.log(response.body);
+    // Memeriksa apakah respons adalah array
+    expect(Array.isArray(response.body.data)).toBeTruthy();
+    // Memeriksa apakah setiap item dalam respons mengandung setidaknya satu kata kunci pencarian
+    response.body.data.forEach((item) => {
+      expect(
+        item.searchTerm1.includes("test1") ||
+          item.searchTerm2.includes("test2") ||
+          item.searchTerm3.includes("test3")
+      ).toBeTruthy();
+    });
+  });
+});
+```
+
+### 8. Test Koneksi Mysql
+- Util-test
+```
+//test/util-test.js
+import { query } from "../src/util/db.js";
+
+//a. Delete data
+export const deleteAllTestSiswa = async () => {
+  await query('DELETE FROM tbsiswa')
+  console.log(`Delete All Test data`)
+}
+
+
+//b. Insert data 50
+export const insertManyTestSiswa = async () => {
+  let data = {}
+  for (let i = 0; i < 50; i++) {
+    data = {
+      first_name: `test ${i}`,
+      last_name: `test ${i}`,
+      email: `test${i}@gmail.com`,
+      phone: `080900000${i}`
+    }
+    let dataInsert = Object.values(data);
+    await query('INSERT INTO tbsiswa (first_name,last_name,email,phone) VALUES (?, ?, ?,?)', dataInsert);
+  }
+  console.log(`Insert Test 10 data`)
+}
+
+//c. Insert data 1
+export const insertTestSiswa = async () => {
+    const data = {
+      first_name: `test-Insert`,
+      last_name: `test-Insert`,
+      email: `testinsert@gmail.com`,
+      phone: `08090000000`
+    }
+    let dataInsert = Object.values(data);
+    await query('INSERT INTO tbsiswa (first_name,last_name,email,phone) VALUES (?, ?, ?,?)', dataInsert);
+    console.log(`Insert Test 1 data`)
+  }
+  
+  //d. Select All data
+  export const selectAllTestSiswa = async () => {
+    const rows = await query('SELECT * FROM tbsiswa ')
+    console.log(`Select All Test data`)
+    return rows
+  }
+```
+- Unit Test
+```
+//test/db.test.js
+import { query } from "../src/util/db.js";
+import { deleteAllTestSiswa, insertTestSiswa } from "./util-test.js";
+
+//TEST KONEKSI DB
+describe('TEST DATABASE', () => {
+
+ //a.Insert data(10)
+ beforeEach(async () => {
+    await deleteAllTestSiswa();
+    await insertTestSiswa();
+  })
+  //d.Delete data
+  afterEach(async () => {
+    await deleteAllTestSiswa();
+  })
+
+  it('Koneksi databse >> query SELECT ', async () => {
+
+   //Select semua data dari tabel tbsiswa
+    const rows = await query('SELECT * FROM tbsiswa')
+    //tampilkan di log
+    console.log(`GET DATA:${JSON.stringify(rows)}`);
+    // Memeriksa panjang array
+    expect(rows.length).toBeGreaterThan(0);
+    // Memeriksa apakah objek mengandung nilai tertentu
+    expect(rows[0]).toEqual(expect.objectContaining({ "first_name": "test-Insert" }));
+  })
+
+})
+```
 ### 8. GET Data ALL (READ)
 
-### 9. GET Data ALL bersyarat (READ)
+- GET /api/siswa
+```json
+ [
+      {
+        id: 370,
+        first_name: 'test 0',
+        last_name: 'test 0',
+        email: 'test0@gmail.com',
+        phone: '0809000000'
+      },
+      {
+        id: 371,
+        first_name: 'test 1',
+        last_name: 'test 1',
+        email: 'test1@gmail.com',
+        phone: '0809000001'
+      },
+      {
+        id: 372,
+        first_name: 'test 2',
+        last_name: 'test 2',
+        email: 'test2@gmail.com',
+        phone: '0809000002'
+      },
+      {
+        id: 373,
+        first_name: 'test 3',
+        last_name: 'test 3',
+        email: 'test3@gmail.com',
+        phone: '0809000003'
+      },
+      {
+        id: 374,
+        first_name: 'test 4',
+        last_name: 'test 4',
+        email: 'test4@gmail.com',
+        phone: '0809000004'
+      },
+      {
+        id: 375,
+        first_name: 'test 5',
+        last_name: 'test 5',
+        email: 'test5@gmail.com',
+        phone: '0809000005'
+      },
+      {
+        id: 376,
+        first_name: 'test 6',
+        last_name: 'test 6',
+        email: 'test6@gmail.com',
+        phone: '0809000006'
+      },
+      {
+        id: 377,
+        first_name: 'test 7',
+        last_name: 'test 7',
+        email: 'test7@gmail.com',
+        phone: '0809000007'
+      },
+      {
+        id: 378,
+        first_name: 'test 8',
+        last_name: 'test 8',
+        email: 'test8@gmail.com',
+        phone: '0809000008'
+      },
+      {
+        id: 379,
+        first_name: 'test 9',
+        last_name: 'test 9',
+        email: 'test9@gmail.com',
+        phone: '0809000009'
+      }
+    ]
+```
+- GET /api/siswa?page=2&size=5
+```json
+{
+      data: [
+        {
+          id: 395,
+          first_name: 'test 5',
+          last_name: 'test 5',
+          email: 'test5@gmail.com',
+          phone: '0809000005'
+        },
+        {
+          id: 396,
+          first_name: 'test 6',
+          last_name: 'test 6',
+          email: 'test6@gmail.com',
+          phone: '0809000006'
+        },
+        {
+          id: 397,
+          first_name: 'test 7',
+          last_name: 'test 7',
+          email: 'test7@gmail.com',
+          phone: '0809000007'
+        },
+        {
+          id: 398,
+          first_name: 'test 8',
+          last_name: 'test 8',
+          email: 'test8@gmail.com',
+          phone: '0809000008'
+        },
+        {
+          id: 399,
+          first_name: 'test 9',
+          last_name: 'test 9',
+          email: 'test9@gmail.com',
+          phone: '0809000009'
+        }
+      ]
+    }
+```
+- Endpoint
+```
+//src/siswa.js
+import express from "express";
+import { query } from "./util/db.js";
 
+export const SiswaRouter = express.Router();
+
+//1. GET : Endpoint : GET /api/siswa
+SiswaRouter.get("/", async (req, res, next) => {
+  console.log('Request URL:', req.url);
+  const page = parseInt(req.query.page) || 1;
+  const size = parseInt(req.query.size) || 10;
+  const offset = (page - 1) * size;
+
+  //Perintah SQL
+  // Query untuk mengambil data dengan paging
+  const SQLQuery = `SELECT * FROM tbsiswa LIMIT ${size} OFFSET ${offset}`;
+  try {
+    //Perintah Query SQL ke database >> SELECT * FROM tabel
+    const rows = await query(SQLQuery)
+    //tampilkan di log
+    console.log(`GET DATA:${JSON.stringify(rows)}`);
+    //kirim status 200 dan data >> array object rows
+    res.status(200).json({ 'data': rows })
+  } catch (error) {
+    console.log(`Error: ${error.message}`);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+```
+- Unit Test
+```
+import supertest from "supertest";
+import { app } from "../application.js";
+import {
+  deleteAllTestSiswa,
+  insertManyTestSiswa,
+} from "../../test/util-test.js";
+
+describe("1. GET /api/siswa", () => {
+  //a.Insert data(10)
+  beforeEach(async () => {
+    await deleteAllTestSiswa();
+    await insertManyTestSiswa();
+    //karena insert datanya banyak maka timout 500ms default >> 30000ms
+  }, 30000);
+
+  //d.Delete data
+  afterEach(async () => {
+    await deleteAllTestSiswa();
+  });
+
+  it("should respond with paging", async () => {
+    const response = await supertest(app)
+      .get("/api/siswa")
+      .expect("Content-Type", /json/)
+      .expect(200);
+    console.log("BODY :", response.body.data);
+    // Memeriksa apakah respons adalah array
+    expect(Array.isArray(response.body.data)).toBeTruthy();
+
+    // Memeriksa apakah panjang respons tidak melebihi batas yang ditentukan
+    expect(response.body.data.length).toBeGreaterThanOrEqual(10);
+  });
+});
+
+describe("2. GET /api/siswa?page=2&size=5", () => {
+  //a.Insert data(10)
+  beforeEach(async () => {
+    await deleteAllTestSiswa();
+    await insertManyTestSiswa();
+    //karena insert datanya banyak maka timout 500ms default >> 30000ms
+  }, 30000);
+
+  //d.Delete data
+  afterEach(async () => {
+    await deleteAllTestSiswa();
+  });
+
+  it("should respond with paging", async () => {
+    const response = await supertest(app)
+      .get("/api/siswa?page=2&size=5")
+      .expect("Content-Type", /json/)
+      .expect(200);
+    console.log("BODY :", response.body);
+    // Memeriksa apakah respons adalah array
+    expect(Array.isArray(response.body.data)).toBeTruthy();
+
+    // Memeriksa apakah panjang respons tidak melebihi batas yang ditentukan
+    expect(response.body.data.length).toBeGreaterThanOrEqual(5);
+  });
+});
+```
+
+### 9. GET Data ALL bersyarat (READ)
+- GET /api/siswa/search?page=1&limit=10&first_name=test
+Response : 
+```json
+    {
+      data: [
+        {
+          id: 350,
+          first_name: 'test 0',
+          last_name: 'test 0',
+          email: 'test0@gmail.com',
+          phone: '0809000000'
+        },
+        {
+          id: 351,
+          first_name: 'test 1',
+          last_name: 'test 1',
+          email: 'test1@gmail.com',
+          phone: '0809000001'
+        },
+        {
+          id: 352,
+          first_name: 'test 2',
+          last_name: 'test 2',
+          email: 'test2@gmail.com',
+          phone: '0809000002'
+        },
+        {
+          id: 353,
+          first_name: 'test 3',
+          last_name: 'test 3',
+          email: 'test3@gmail.com',
+          phone: '0809000003'
+        },
+        {
+          id: 354,
+          first_name: 'test 4',
+          last_name: 'test 4',
+          email: 'test4@gmail.com',
+          phone: '0809000004'
+        },
+        {
+          id: 355,
+          first_name: 'test 5',
+          last_name: 'test 5',
+          email: 'test5@gmail.com',
+          phone: '0809000005'
+        },
+        {
+          id: 356,
+          first_name: 'test 6',
+          last_name: 'test 6',
+          email: 'test6@gmail.com',
+          phone: '0809000006'
+        },
+        {
+          id: 357,
+          first_name: 'test 7',
+          last_name: 'test 7',
+          email: 'test7@gmail.com',
+          phone: '0809000007'
+        },
+        {
+          id: 358,
+          first_name: 'test 8',
+          last_name: 'test 8',
+          email: 'test8@gmail.com',
+          phone: '0809000008'
+        },
+        {
+          id: 359,
+          first_name: 'test 9',
+          last_name: 'test 9',
+          email: 'test9@gmail.com',
+          phone: '0809000009'
+        }
+      ]
+    }
+```
+- Endpoint
+```
+//2. GET : Endpoint : GET /api/siswa/search
+SiswaRouter.get("/search", async (req, res, next) => {
+    const page = parseInt(req.query.page) || 1;
+    const size = parseInt(req.query.size) || 10;
+    const offset = (page - 1) * size;
+    const first_name = req.query.first_name;
+    const last_name = req.query.last_name;
+    const email = req.query.email;
+  
+    // Query untuk mengambil data dengan paging
+    // Buat query untuk mengambil data dengan paging dan pencarian bersyarat
+    let SQLQuery = `SELECT * FROM tbsiswa WHERE 1=1`;
+  
+    // Tambahkan kondisi WHERE berdasarkan searchTerm yang diberikan
+    if (first_name) {
+      SQLQuery += ` AND first_name LIKE '%${first_name}%'`;
+    }
+    if (last_name) {
+      SQLQuery += ` AND last_name LIKE '%${last_name}%'`;
+    }
+    if (email) {
+      SQLQuery += ` AND email LIKE '%${email}%'`;
+    }
+  
+    SQLQuery += ` LIMIT ${size} OFFSET ${offset}`;
+
+    try {
+      //Perintah Query SQL ke database >> SELECT * FROM tabel
+      const rows = await query(SQLQuery)
+      //tampilkan di log
+      console.log(`GET DATA:${JSON.stringify(rows)}`);
+      //kirim status 200 dan data >> array object rows
+      res.status(200).json({ 'data': rows })
+    } catch (error) {
+      console.log(`Error: ${error.message}`);
+      res.status(500).send('Internal Server Error');
+    }
+});
+```
+- Unit Test
+```
+describe.skip("3. GET /api/siswa/search?page=1&limit=10&first_name=test",  () => {
+  //a.Insert data(10)
+  beforeEach(async () => {
+    await deleteAllTestSiswa();
+    await insertManyTestSiswa();
+    //karena insert datanya banyak maka timout 500ms default >> 30000ms
+  }, 30000);
+
+  //d.Delete data
+  afterEach(async () => {
+    await deleteAllTestSiswa();
+  });
+
+  it("responds with data with paging and search terms", async function () {
+    const response = await supertest(app)
+      .get(
+        "/api/siswa/search?page=1&limit=10&first_name=test"
+      )
+      .expect("Content-Type", /json/)
+      .expect(200);
+    console.log(response.body);
+    // Memeriksa apakah respons adalah array
+    expect(Array.isArray(response.body.data)).toBeTruthy();
+    // Memeriksa apakah setiap item dalam respons mengandung setidaknya satu kata kunci pencarian
+    response.body.data.forEach((item) => {
+      expect(
+        item.first_name.includes("test") ||
+          item.last_name.includes("test") ||
+          item.email.includes("test")
+      ).toBeTruthy();
+    });
+  });
+});
+
+```

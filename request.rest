@@ -12,3 +12,12 @@ Content-Type: application/json
   "nama" : "Silmi",
   "alamat": "Karangawen"
 }
+
+### GET Tanpa Limit
+GET http://localhost:3000/api/siswa
+
+### GET Dengan Limit
+GET http://localhost:3000/api/siswa?page=2&size=5
+
+### GET Dengan Limit dan Syarat
+GET http://localhost:3000/api/siswa/search?page=1&limit=10&searchTerm1=test1&searchTerm2=test2&searchTerm3=test3
