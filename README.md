@@ -292,14 +292,13 @@ describe('Test Untuk 1 dan 3', () => {
 });
 ```
 
-### 5. Membuat EndPoint CRUD Dokumentasi
+### 5. Membuat EndPoint GET dengan paging
 
-### 6. GET Data ALL (READ)
+### 6. Konfigurasi Mysql
 
-### 7. GET Data /id (READ)
+### 7. Test Koneksi Mysql
 
-### 8. POST Data (CREATE)
+### 8. GET Data ALL (READ)
 
-### 9. DELETE Data /id (DELETE)
+### 9. GET Data ALL bersyarat (READ)
 
-### 10. PUT Data /id (UPDATE)
