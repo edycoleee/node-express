@@ -99,7 +99,7 @@ Berikut adalah beberapa contoh penggunaan umum objek app pada Express:
 
 ```
 app.get('/', function(req, res) {
-  res.send('Halo dunia!');
+  res.send('Hello World!');
 });
 ```
 
