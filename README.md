@@ -87,36 +87,60 @@ coverage
 ## 2. Mengenal Express JS
 
 ExpressJS adalah salah satu Web Framework OpenSource paling populer di NodeJS
-ExpressJS pertama kali dibuat tahun 2010, dan karena sangat populer, ExpressJS sekarang sudah menjadi hal yang wajib dikuasai ketika kita akan membuat Web menggunakan NodeJS
 
-Application
+### Object App dari Express
 
-Saat kita membuat web menggunakan ExpressJS, kita akan membuat object Application
-Application adalah object utama dalam library ExpressJS
+`export const app = express();`
 
-Application secara default tidak berjalan, jika kita ingin menjalankan Application nya, kita perlu menggunakan method listen(port)
-Dimana port adalah nomor port yang ingin kita gunakan untuk menjalankan web nya
-Pastikan port yang kita pilih tidak bentrok dengan aplikasi lain
+Objek app pada Express adalah inti dari aplikasi Express. Dengan objek ini, Anda dapat membuat rute, menangani permintaan HTTP, mengatur middleware, dan berbagai fungsi lainnya yang terkait dengan pengaturan dan penanganan aplikasi web.
 
-#### JALANKAN SERVER NODEJS DENGAN EXPRESS
+Berikut adalah beberapa contoh penggunaan umum objek app pada Express:
+
+1. Membuat Rute: Anda dapat menggunakan metode `app.get()`, `app.post()`, `app.put()`, `app.delete()`, dll., untuk menentukan rute HTTP dan menangani permintaan yang sesuai.
+
+```
+app.get('/', function(req, res) {
+  res.send('Halo dunia!');
+});
+```
+
+2. Mengatur Middleware: Middleware adalah fungsi-fungsi yang dipanggil sebelum penanganan permintaan akhir. Dengan Express, Anda dapat menggunakan metode `app.use()` untuk mengatur middleware.
+
+```
+app.use(express.json()); // Middleware untuk menangani JSON data
+```
+
+3. Menjalankan Server: Seperti yang Anda lihat dalam potongan kode sebelumnya, Anda menggunakan objek app untuk memanggil metode `listen()` untuk memulai server dan mendengarkan koneksi masuk.
+
+```
+app.listen(PORT, function() {
+  console.log(`Server berjalan di port ${PORT}`);
+});
+```
+
+### Application :: _a.import library >> b.app object >> c.port >> d.listen_
 
 ```
 //src/index.js
+//a. import library Framework express
 import express from "express";
 
-//a. membuat object app dari express
+//b. membuat object app dari express function
 export const app = express();
 
-//b. Jalankan server
+//c. definisikan PORT sebagai variable,
+// sehingga mudah menggantinya jika diperlukan
 const PORT = process.env.PORT || 3000;
 
-//c. listen request app pada port >> 3000
+//d. metode app.listen untuk memulai sebuah server dan mendengarkan koneksi masuk pada port
+//app.listen(PORT, callback)
+//() => {...}: arrow function, used as the callback function. logs a message to the console
 app.listen(PORT, () => {
   console.log(`Server started on port ${PORT}`);
 });
 ```
 
-`npm run dev`
+### Jalankan Server : `npm run dev`
 
 ## 3. Basic Testing
 
@@ -131,17 +155,42 @@ Response Body Success :
 ```
 
 2. Endpoint GET http://localhost:3000/oby > Request => Response json Object
+
    Response Body Success :
 
 ```json
-
+{
+  "message": "GET Data Pasien Sukses",
+  "data": {
+    "nama": "Edy",
+    "alamat": "Semarang"
+  }
+}
 ```
 
 3. Endpoint POST http://localhost:3000/api/pasien > Request+Body => Response json Object
-   Response Body Success :
+
+   Request Body :
 
 ```json
+Content-Type: application/json
 
+{
+  "nama" : "Silmi",
+  "alamat": "Karangawen"
+}
+```
+
+Response Body Success :
+
+```json
+{
+  "message": "POST Data Pasien Sukses",
+  "data": {
+    "nama": "Silmi",
+    "alamat": "Karangawen"
+  }
+}
 ```
 
 Untuk pertama kita buat :
@@ -154,28 +203,39 @@ Untuk pertama kita buat :
 //src/index.js
 import { app } from "./application.js";
 
-//variabel PORT
+//c. definisikan PORT sebagai variable,
+// sehingga mudah menggantinya jika diperlukan
 const PORT = process.env.PORT || 3000;
 
-//c. Jalankan server liste port >> 3000
+//d. metode app.listen untuk memulai sebuah server dan mendengarkan koneksi masuk pada port
+//app.listen(PORT, callback)
+//() => {...}: arrow function, used as the callback function. logs a message to the console
 app.listen(PORT, () => {
-    console.log(`Server started on port ${PORT}`);
+  console.log(`Server started on port ${PORT}`);
 });
 ```
 
 - endpoint GET http://localhost:3000/
 
+Response Body Success :
+
+```json
+"Hello World!"
+```
+
 ```
 //src/application.js
+//a. import library Framework express
 import express from "express";
 
-//a. membuat object app dari express
+//b. membuat object app dari express function
 export const app = express();
 
-//b. jalankan middleware json express
+//e. Menjalankan Middleware app.use menangani data json
 app.use(express.json());
 
-//1. Contoh Endpoint API
+//f. Membuat Rute >> app.get(Route, callback) >> (req,res) => {...}
+//1. Contoh : Endpoint API : GET '/' ========================
 app.get('/', (req, res) => {
     console.log('Hello World requested');
     res.send('Hello World!');
@@ -186,23 +246,61 @@ app.get('/', (req, res) => {
 
 ```
 //request.rest
-### TEST request GET ke http://localhost:3000/
+### 1. Contoh : Endpoint API : GET '/'
 GET http://localhost:3000/
 
+###
 ```
 
 - melakukan pengetesan dengan unit test
+
+Unit Test adalah callback function
+
+```
+1. fungsi testing : describe >> it =======================
+describe('Nama Test', callback1)
+callback1 >> () => {it('Nama Sub Test', callback2)}
+callback2 >> async()=>{...}
+
+describe("Test1", () => {
+  it("Test 1.a", async() => {
+    expect(...).toBe(...);
+  });
+  it("Test 1.b", async() => {
+    expect(...).toBe(...);
+  });
+});
+
+2. fungsi testing : describe >> test =======================
+describe('Nama Test', callback1)
+callback1 >> () => {test('Nama Sub Test', callback2)}
+callback2 >> async()=>{...}
+
+describe("Test1", () => {
+  test("Test 1.a", async() => {
+    expect(...).toBe(...);
+  });
+  test("Test 1.b", async() => {
+    expect(...).toBe(...);
+  });
+});
+```
+
+Unit Test :
 
 ```
 //test/app.test.js
 const request = require('supertest');
 const { app } = require('../src/application');
 
-//a. fungsi testing dengan describe >> it
-describe('TEST GET http://localhost:3000/', () => {
-  it('Mendapatkan return Hello World', async () => {
-    //b. lakukan request "/" dan tangkap hasilnya ke variable response
-    const response = await request(app).get('/');
+//a. fungsi testing : describe >> it
+describe('TEST GET No 1 dan No 3', () => {
+
+  //1. TEST No 1 >> GET http://localhost:3000/
+  it('TEST GET http://localhost:3000/', async () => {
+    //b. lakukan request, GET "/" dan tangkap hasilnya ke variable response
+    const response = await request(app)
+    .get('/');
     //c. Jika request berhasil ke server maka status response = 200
     expect(response.status).toBe(200);
     //d. Periksa isi response seharusnya 'Hello World!'
@@ -216,21 +314,35 @@ describe('TEST GET http://localhost:3000/', () => {
 
 4. Basic Routing
 
-### 2. Endpoint GET http://localhost:3000/oby > Request => Response json Object
+#### 2. Endpoint GET http://localhost:3000/oby > Request => Response json Object
 
 - end point GET http://localhost:3000/oby
 
+  Response Body Success :
+
+```json
+{
+  "message": "GET Data Pasien Sukses",
+  "data": {
+    "nama": "Edy",
+    "alamat": "Semarang"
+  }
+}
+```
+
 ```
 //src/application.js
+//a. import library Framework express
 import express from "express";
 
-//a. membuat object app dari express
+//b. membuat object app dari express function
 export const app = express();
 
-//b. jalankan middleware json express
+//e. Menjalankan Middleware app.use menangani data json
 app.use(express.json());
 
-//1. Contoh Endpoint API
+//f. Membuat Rute >> app.get(Route, callback) >> (req,res) => {...}
+//1. Contoh : Endpoint API : GET '/' ========================
 app.get('/', (req, res) => {
     console.log('Hello World requested');
     res.send('Hello World!');
@@ -260,7 +372,7 @@ router.get('/oby', (req, res, next) => {
 - test rest
 
 ```
-###
+### 2. Contoh Endpoint API >> GET /oby
 GET http://localhost:3000/oby
 ```
 
@@ -268,9 +380,12 @@ GET http://localhost:3000/oby
 
 ```
 //Test GET http://localhost:3000/oby
-test("Test GET /oby", async () => {
-  //Cek response Object >> body >> toEqual
-  const response = await request(app).get("/oby");
+//a. fungsi testing : test
+test("TEST GET http://localhost:3000/oby", async () => {
+  /b. lakukan request, GET "/oby" dan tangkap hasilnya ke variable response
+  const response = await request(app)
+  .get("/oby");
+  //c. Cek response Object >> body >> toEqual (sama)
   expect(response.body).toEqual({
     message: 'GET Data Pasien Sukses',
     data: {
@@ -281,13 +396,38 @@ test("Test GET /oby", async () => {
 })
 ```
 
-## 5. Req Body >> Response Body
+#### 3. Req Body >> Response Body
 
 - endpoint POST http://localhost:3000/api/pasien
 
+Request Body :
+
+```json
+Content-Type: application/json
+
+{
+  "nama" : "Silmi",
+  "alamat": "Karangawen"
+}
+```
+
+Response Body Success :
+
+```json
+{
+  "message": "POST Data Pasien Sukses",
+  "data": {
+    "nama": "Silmi",
+    "alamat": "Karangawen"
+  }
+}
+```
+
 ```
 //3. Contoh Endpoint API >> POST /api/pasien >> Req Body >> Res Body
+//Membuat Rute >> app.post(Route, callback) >> (req,res) => {res.json({...})}
 router.post('/pasien', (req, res, next) => {
+    //kirim json >> data berasal dari request body
     res.json({
         message: 'POST Data Pasien Sukses',
         data: req.body
@@ -299,7 +439,7 @@ app.use("/api", router)
 - request test
 
 ```
-###
+### 3. POST http://localhost:3000/api/pasien
 POST http://localhost:3000/api/pasien
 Content-Type: application/json
 
@@ -312,25 +452,38 @@ Content-Type: application/json
 - unit test
 
 ```
-describe('Test Untuk 1 dan 3', () => {
+//fungsi test gabungkan dengan test pertama dan menjadi sub ke dua
 
-  //1. test GET http://localhost:3000
-  it('should return Hello World', async () => {
-    const response = await request(app).get('/');
+//a. fungsi testing : describe >> it
+describe('TEST GET No 1 dan No 3', () => {
+
+  //1. TEST No 1 >> GET http://localhost:3000/
+  it('TEST GET http://localhost:3000/', async () => {
+    //b. lakukan request, GET "/" dan tangkap hasilnya ke variable response
+    const response = await request(app)
+    .get('/');
+    //c. Jika request berhasil ke server maka status response = 200
     expect(response.status).toBe(200);
+    //d. Periksa isi response seharusnya 'Hello World!'
     expect(response.text).toBe('Hello World!');
   });
 
-  //3. test POST http://localhost:3000/api/pasien
-  it('should return Body', async () => {
+  //3. test POST http://localhost:3000/api/pasien ================
+  it('POST http://localhost:3000/api/pasien', async () => {
+    //b. buat variable data body yang akan dikirim
     const dataKirim = {
       "nama": "Silmi",
       "alamat": "Karangawen"
     }
+     //c. lakukan request, POST "/api/pasien" dan tangkap hasilnya ke variable response
     const response = await request(app)
+      //kirim post
       .post('/api/pasien')
+      //kirim send body
       .send(dataKirim);
+    //d. Jika request berhasil ke server maka status response = 200
     expect(response.status).toBe(200);
+    //e. respose body yang diharapkan adalah sama dengan data berikut
     expect(response.body).toEqual({
       message: 'POST Data Pasien Sukses',
       data: dataKirim
